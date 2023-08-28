@@ -19,6 +19,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -100,12 +101,6 @@ type API struct {
 	// Publishes notifications when new entries are added to the log. May be
 	// nil if no publisher is configured.
 	newEntryPublisher pubsub.Publisher
-	algorithmRegistry *signature.AlgorithmRegistryConfig
-	// Stores map of inactive tree IDs to checkpoints
-	// Inactive shards will always return the same checkpoint,
-	// so we can fetch the checkpoint on service startup to
-	// minimize signature generations
-	cachedCheckpoints map[int64]string
 }
 
 var AllowedClientSigningAlgorithms = []v1.PublicKeyDetails{
@@ -213,15 +208,29 @@ func NewAPI(treeID uint) (*API, error) {
 		log.ContextLogger(ctx).Infof("Initialized new entry event publisher: %s", p)
 	}
 
+	var newEntryPublisher pubsub.Publisher
+	if p := viper.GetString("rekor_server.new_entry_publisher"); p != "" {
+		if !viper.GetBool("rekor_server.publish_events_protobuf") && !viper.GetBool("rekor_server.publish_events_json") {
+			return nil, fmt.Errorf("%q is configured but neither %q or %q are enabled", "new_entry_publisher", "publish_events_protobuf", "publish_events_json")
+		}
+		newEntryPublisher, err = pubsub.Get(ctx, p)
+		if err != nil {
+			return nil, fmt.Errorf("init event publisher: %w", err)
+		}
+		log.ContextLogger(ctx).Infof("Initialized new entry event publisher: %s", p)
+	}
+
 	return &API{
 		// Transparency Log Stuff
 		logClient: logClient,
 		treeID:    tid,
 		logRanges: ranges,
+		// Signing/verifying fields
+		pubkey:     string(pubkey),
+		pubkeyHash: hex.EncodeToString(pubkeyHashBytes[:]),
+		signer:     rekorSigner,
 		// Utility functionality not required for operation of the core service
 		newEntryPublisher: newEntryPublisher,
-		algorithmRegistry: algorithmRegistry,
-		cachedCheckpoints: cachedCheckpoints,
 	}, nil
 }
 
@@ -289,14 +298,6 @@ func StopAPI() {
 	api.checkpointPublishCancel()
 
 	if api.newEntryPublisher != nil {
-		if err := api.newEntryPublisher.Close(); err != nil {
-			log.Logger.Errorf("shutting down newEntryPublisher: %v", err)
-		}
-	}
-
-	if indexStorageClient != nil {
-		if err := indexStorageClient.Shutdown(); err != nil {
-			log.Logger.Errorf("shutting down indexStorageClient: %v", err)
-		}
+		api.newEntryPublisher.Close()
 	}
 }

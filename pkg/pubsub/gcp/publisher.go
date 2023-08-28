@@ -27,7 +27,7 @@ import (
 	"github.com/sigstore/rekor/pkg/events"
 	sigpubsub "github.com/sigstore/rekor/pkg/pubsub"
 
-	"cloud.google.com/go/pubsub/v2"
+	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
 )
 
@@ -45,6 +45,7 @@ var (
 	// Minimal set of permissions needed to check if the server can publish to the configured topic.
 	// https://cloud.google.com/pubsub/docs/access-control#required_permissions
 	requiredIAMPermissions = []string{
+		"pubsub.topics.get",
 		"pubsub.topics.publish",
 	}
 )

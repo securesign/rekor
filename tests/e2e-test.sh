@@ -31,7 +31,7 @@ echo "building test-only containers"
 docker build -t gcp-pubsub-emulator -f Dockerfile.pubsub-emulator .
 
 echo "starting services"
-${docker_compose} up -d --build
+docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
 
 echo "building CLI and server"
 go test -c ./cmd/rekor-cli -o rekor-cli -cover -covermode=count -coverpkg=./...
@@ -40,8 +40,8 @@ go test -c ./cmd/rekor-server -o rekor-server -covermode=count -coverpkg=./...
 count=0
 
 echo "waiting up to 2 min for system to start"
-until [ $(${docker_compose} ps | \
-   grep -E "(rekor[-_]mysql|rekor[-_]redis|rekor[-_]rekor-server|rekor[-_]gcp-pubsub-emulator)" | \
+until [ $(docker compose ps | \
+   grep -E "(rekor-mysql|rekor-redis|rekor-server|gcp-pubsub-emulator)" | \
    grep -c "(healthy)" ) == 4 ];
 do
     if [ $count -eq 24 ]; then
@@ -60,27 +60,33 @@ REKORTMPDIR="$(mktemp -d -t rekor_test.XXXXXX)"
 touch $REKORTMPDIR.rekor.yaml
 trap "rm -rf $REKORTMPDIR" EXIT
 if ! REKORTMPDIR=$REKORTMPDIR go test -tags=e2e ./tests/ -run TestIssue1308; then
-   ${docker_compose} logs --no-color > /tmp/docker-compose.log
+   docker compose logs --no-color > /tmp/docker compose.log
    exit 1
 fi
 if ! REKORTMPDIR=$REKORTMPDIR PUBSUB_EMULATOR_HOST=localhost:8085 go test -tags=e2e ./tests/; then 
-   ${docker_compose} logs --no-color > /tmp/docker-compose.log
+   docker compose logs --no-color > /tmp/docker compose.log
    exit 1
 fi
-if ${docker_compose} logs --no-color | grep -q "panic: runtime error:" ; then
+if docker compose logs --no-color | grep -q "panic: runtime error:" ; then
    # if we're here, we found a panic
    echo "Failing due to panics detected in logs"
-   ${docker_compose} logs --no-color > /tmp/docker-compose.log
+   docker compose logs --no-color > /tmp/docker compose.log
    exit 1
 fi
 
 echo "generating code coverage"
-${docker_compose} restart rekor-server
+docker compose restart rekor-server
 
-if ! docker cp $(docker ps -aqf "name=rekor_rekor-server" -f "name=rekor-rekor-server"):/go/rekor-server.cov /tmp/rekor-server.cov ; then
+# docker compose appears to name the containers slightly differently in GHA CI vs locally on macOS
+container_name="rekor_rekor-server"
+if [[ "$(uname -s)" -eq "Darwin" ]]; then
+   container_name="rekor-rekor-server"
+fi
+
+if ! docker cp $(docker ps -aqf "name=${container_name}"):/go/rekor-server.cov /tmp/rekor-server.cov ; then
    # failed to copy code coverage report from server
    echo "Failed to retrieve server code coverage report"
-   ${docker_compose} logs --no-color > /tmp/docker-compose.log
+   docker compose logs --no-color > /tmp/docker compose.log
    exit 1
 fi
 

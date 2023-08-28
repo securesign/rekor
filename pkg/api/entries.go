@@ -50,7 +50,6 @@ import (
 	"github.com/sigstore/rekor/pkg/generated/models"
 	"github.com/sigstore/rekor/pkg/generated/restapi/operations/entries"
 	"github.com/sigstore/rekor/pkg/log"
-	"github.com/sigstore/rekor/pkg/pki/identity"
 	"github.com/sigstore/rekor/pkg/pubsub"
 	"github.com/sigstore/rekor/pkg/sharding"
 	"github.com/sigstore/rekor/pkg/tle"
@@ -499,7 +498,7 @@ func createLogEntry(params entries.CreateLogEntryParams) (models.LogEntry, middl
 }
 
 func publishEvent(ctx context.Context, publisher pubsub.Publisher, event *events.Event, contentType events.EventContentType) {
-	err := publisher.Publish(ctx, event, contentType)
+	err := publisher.Publish(context.WithoutCancel(ctx), event, contentType)
 	incPublishEvent(event.Type().Name(), contentType, err == nil)
 	if err != nil {
 		log.ContextLogger(ctx).Error(err)
