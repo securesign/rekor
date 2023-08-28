@@ -43,6 +43,7 @@ REPO_NAME=$(basename $(git rev-parse --show-toplevel))
 
 # Custom files
 custom_files=$(cat <<EOT | tr '\n' ' '
+.tekton
 redhat
 OWNERS
 EOT
