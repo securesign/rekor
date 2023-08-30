@@ -7,13 +7,13 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: '[push]'
-    pipelinesascode.tekton.dev/on-target-branch: '[main]'
+    pipelinesascode.tekton.dev/on-target-branch: '[redhat-v1.2.2]'
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rekor
-    appstudio.openshift.io/component: rekor-cli
+    appstudio.openshift.io/component: rekor-server
     pipelines.appstudio.openshift.io/type: build
-  name: rekor-cli-on-push
+  name: rekor-server-on-push
   namespace: securesign-tenant
 spec:
   params:
@@ -22,7 +22,7 @@ spec:
   - name: git-url
     value: '{{repo_url}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/securesign-tenant/rekor/rekor-cli:{{revision}}
+    value: quay.io/redhat-user-workloads/securesign-tenant/rekor/rekor-server:{{revision}}
   - name: path-context
     value: .
   - name: revision
