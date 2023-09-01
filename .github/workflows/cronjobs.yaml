@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Configure upstream
-        run: git remote add upstream git@github.com:sigstore/rekor.git
+        run: git remote add upstream https://github.com/sigstore/rekor
       - name: Check for existing pull request
         run: |
           openPRs="$(gh pr list --state open -H release-next-ci --json number | jq -r '.[].number' | wc -l)"
