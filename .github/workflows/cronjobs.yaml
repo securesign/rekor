@@ -15,8 +15,8 @@ jobs:
       - name: Configure upstream
         run: |
           git remote add upstream https://github.com/sigstore/rekor
-          git config --global user.email "lball@redhat.com"
-          git config --global user.name "Lance Ball"
+          git config --global user.email "github-actions-bot@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
       - name: Check for existing pull request
         run: |
           openPRs="$(gh pr list --state open -H release-next-ci --json number | jq -r '.[].number' | wc -l)"
