@@ -11,9 +11,9 @@ metadata:
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rekor
-    appstudio.openshift.io/component: rekor-cli
+    appstudio.openshift.io/component: rekor-server
     pipelines.appstudio.openshift.io/type: build
-  name: rekor-cli-on-push
+  name: rekor-server-on-push
   namespace: securesign-tenant
 spec:
   params:
@@ -22,7 +22,7 @@ spec:
   - name: git-url
     value: '{{repo_url}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/securesign-tenant/rekor/rekor-cli:{{revision}}
+    value: quay.io/redhat-user-workloads/securesign-tenant/rekor/rekor-server:{{revision}}
   - name: path-context
     value: .
   - name: revision
