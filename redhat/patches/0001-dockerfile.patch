@@ -1,12 +1,12 @@
 diff --git a/Dockerfile b/Dockerfile
-index 3f6f439..7d04f0c 100644
+index 0f14b70..7d04f0c 100644
 --- a/Dockerfile
 +++ b/Dockerfile
 @@ -13,7 +13,7 @@
  # See the License for the specific language governing permissions and
  # limitations under the License.
  
--FROM golang:1.21.1@sha256:970907c870214ecc19784036f9ba93414213473b03c2b0dc1fa90eeb3a563b8f AS builder
+-FROM golang:1.21.1@sha256:62e5883c278354041360e26dd3ba8c62c8621743a2b4fd7f0f0caf00af45d15c AS builder
 +FROM registry.access.redhat.com/ubi9/go-toolset@sha256:52ab391730a63945f61d93e8c913db4cc7a96f200de909cd525e2632055d9fa6 AS builder
  ENV APP_ROOT=/opt/app-root
  ENV GOPATH=$APP_ROOT
@@ -15,7 +15,7 @@ index 3f6f439..7d04f0c 100644
  RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test ./cmd/rekor-server
  
  # Multi-Stage production build
--FROM golang:1.21.1@sha256:970907c870214ecc19784036f9ba93414213473b03c2b0dc1fa90eeb3a563b8f as deploy
+-FROM golang:1.21.1@sha256:62e5883c278354041360e26dd3ba8c62c8621743a2b4fd7f0f0caf00af45d15c as deploy
 +FROM registry.access.redhat.com/ubi9/go-toolset@sha256:52ab391730a63945f61d93e8c913db4cc7a96f200de909cd525e2632055d9fa6 as deploy
  
  # Retrieve the binary from the previous stage
