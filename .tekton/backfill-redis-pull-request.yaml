@@ -365,20 +365,21 @@ spec:
         operator: in
         values:
         - "false"
-    - name: unit-test
+    - name: run-unit-test
       runAfter:
-      - clone-repository
+      - prefetch-dependencies    
+      taskRef:
+        params:
+        - name: name
+          value: go-unit-test
+        - name: bundle
+          value: quay.io/securesign/go-unit-test@sha256:2743ce9106dd0eeb15dd60f6b9e0e79f69e7f0854969f9da7e0cd9251aff7217
+        - name: kind
+          value: task
+        resolver: bundles
       workspaces:
-        - name: output
+        - name: source
           workspace: workspace
-      taskSpec:
-        steps:
-        - name: run-unit-tests
-          image: registry.access.redhat.com/ubi9/go-toolset@sha256:52ab391730a63945f61d93e8c913db4cc7a96f200de909cd525e2632055d9fa6
-          script: |
-            #!/bin/bash
-            cd / && cd workspace/output
-            GOFLAGS="" make test
     workspaces:
     - name: workspace
     - name: git-auth
