@@ -1,0 +1,13 @@
+diff --git a/scripts/storage.sql b/scripts/storage.sql
+index 1e691a8..939ed12 100644
+--- a/scripts/storage.sql
++++ b/scripts/storage.sql
+@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS SequencedLeafData(
+ );
+ 
+ 
+-CREATE INDEX SequencedLeafMerkleIdx
++CREATE INDEX IF NOT EXISTS SequencedLeafMerkleIdx
+   ON SequencedLeafData(TreeId, MerkleLeafHash);
+ 
+ CREATE TABLE IF NOT EXISTS Unsequenced(

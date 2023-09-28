@@ -33,6 +33,12 @@ RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./
 # Multi-Stage production build
 FROM registry.access.redhat.com/ubi9/go-toolset@sha256:52ab391730a63945f61d93e8c913db4cc7a96f200de909cd525e2632055d9fa6 as deploy
 
+LABEL description="Rekor provides an immutable tamper resistant ledger of metadata generated within a software projects supply chain."
+LABEL io.k8s.description="Rekor provides an immutable tamper resistant ledger of metadata generated within a software projects supply chain."
+LABEL io.k8s.display-name="Rekor container image for Red Hat Trusted Signer"
+LABEL io.openshift.tags="rekor trusted-signer"
+LABEL summary="The rekor-server binary provides an immutable, tamper-resistant log."
+
 # Retrieve the binary from the previous stage
 COPY --from=builder /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
 
