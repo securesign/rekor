@@ -75,6 +75,9 @@ git checkout origin/$redhat_ref .tekton
 
 # Move overlays to root
 if [[ -d redhat/overlays ]]; then
+  if [[ -f redhat/overlays/Dockerfile ]]; then
+      git rm Dockerfile
+  fi
   git mv redhat/overlays/* .
 fi
 
