@@ -13,6 +13,7 @@ LABEL io.k8s.description="Rekor-cli is a command line interface (CLI) tool used 
 LABEL io.k8s.display-name="Rekor-cli container image for Red Hat Trusted Signer"
 LABEL io.openshift.tags="rekor-cli trusted-signer"
 LABEL summary="Provides the rekor CLI binary for interacting with a rekor server"
+LABEL com.redhat.component="rekor-cli"
 
 COPY --from=build-env /opt/app-root/src/rekor-cli /usr/local/bin/rekor-cli
 WORKDIR /opt/app-root/src/home

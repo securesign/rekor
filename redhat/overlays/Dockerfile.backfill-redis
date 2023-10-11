@@ -15,6 +15,7 @@ LABEL io.k8s.description="Backfillredis is a job that will go through the TLog a
 LABEL io.k8s.display-name="Backfillredis container image for Red Hat Trusted Signer"
 LABEL io.openshift.tags="backfill-redis trusted-signer"
 LABEL summary="Provides the backfill-redis binary for a rekor server"
+LABEL com.redhat.component="backfill-redis"
 
 #ENTRYPOINT
 ENTRYPOINT [ "backfill-redis" ]
