@@ -54,6 +54,7 @@ LABEL io.k8s.description="Rekor-Server provides a tamper resistant ledger."
 LABEL io.k8s.display-name="Rekor-Server container image for Red Hat Trusted Signer"
 LABEL io.openshift.tags="rekor-server trusted-signer"
 LABEL summary="Provides the rekor Server binary for running Rekor-Server"
+LABEL com.redhat.component="rekor-server"
 
 COPY --from=deploy /usr/local/bin/rekor-server /usr/local/bin/rekor-server
 # overwrite server with test build with code coverage
