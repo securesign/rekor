@@ -373,13 +373,46 @@ spec:
         - "false"
     - name: run-unit-test
       runAfter:
-      - prefetch-dependencies    
+      - build-container    
       taskRef:
         params:
         - name: name
           value: go-unit-test
         - name: bundle
           value: quay.io/securesign/rekor-unit-test@sha256:e2713945aa7f1a14bd58a0c809691325fa8070cf6d0a0e476cc9e485cc680826
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+        - name: source
+          workspace: workspace
+    - name: build-test-image
+      runAfter:
+      - build-container    
+      taskRef:
+        params:
+        - name: name
+          value: build-test-image
+        - name: bundle
+          value: quay.io/securesign/rekor-build-test-image@sha256:22556e3111166fc0404394ed2101d0bcde38db2ba9f06c795082f86216ceba23
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+        - name: source
+          workspace: workspace
+    - name: run-e2e-test
+      params:
+      - name: TEST_IMAGE_URL
+        value: $(tasks.build-test-image.results.TEST_IMAGE_URL)
+      runAfter:
+      - build-test-image  
+      taskRef:
+        params:
+        - name: name
+          value: rekor-e2e-test
+        - name: bundle
+          value: quay.io/securesign/rekor-e2e-test@sha256:0edf133224f34cee6873f0dca372c7bec58a651f30fd5556658712b59d71d66a
         - name: kind
           value: task
         resolver: bundles
