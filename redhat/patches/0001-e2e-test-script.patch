@@ -1,0 +1,81 @@
+diff --git a/e2e-test.sh b/e2e-test.sh
+index 19232da..6adda2a 100755
+--- a/e2e-test.sh
++++ b/e2e-test.sh
+@@ -14,27 +14,12 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ 
+-set -e
+-testdir=$(dirname "$0")
+-
+-rm -f /tmp/pkg-rekor-*.cov
+-echo "installing gocovmerge"
+-make gocovmerge
+-docker kill $(docker ps -q) || true
+-echo "starting services"
+-docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
+-
+-echo "building CLI and server"
+-# set the path to the root of the repo
+-dir=$(git rev-parse --show-toplevel)
+-go test -c ./cmd/rekor-cli -o rekor-cli -cover -covermode=count -coverpkg=./...
+-go test -c ./cmd/rekor-server -o rekor-server -covermode=count -coverpkg=./...
+ 
+ count=0
+-echo -n "waiting up to 120 sec for system to start"
+-until [ $(docker-compose ps | grep -c "(healthy)") == 3 ];
++echo -n "waiting up to 160 sec for system to start"
++until curl -s http://localhost:3000 > /dev/null;
+ do
+-    if [ $count -eq 12 ]; then
++    if [ $count -eq 16 ]; then
+        echo "! timeout reached"
+        exit 1
+     else
+@@ -44,33 +29,27 @@ do
+     fi
+ done
+ 
+-echo
++set -e
++testdir=$(dirname "$0")
++
++echo "installing gocovmerge"
++make gocovmerge
++
++echo "building CLI and server"
++dir=$(git rev-parse --show-toplevel)
++go test -c ./cmd/rekor-cli -o rekor-cli -cover -covermode=count -coverpkg=./...
++go test -c ./cmd/rekor-server -o rekor-server -covermode=count -coverpkg=./...
++
+ echo "running tests"
+ REKORTMPDIR="$(mktemp -d -t rekor_test.XXXXXX)"
+ cp $dir/rekor-cli $REKORTMPDIR/rekor-cli
+ touch $REKORTMPDIR.rekor.yaml
+ trap "rm -rf $REKORTMPDIR" EXIT
+-if ! REKORTMPDIR=$REKORTMPDIR go test  -tags=e2e $(go list ./... | grep -v ./tests) ; then
+-   docker-compose logs --no-color > /tmp/docker-compose.log
+-   exit 1
+-fi
+-if docker-compose logs --no-color | grep -q "panic: runtime error:" ; then
+-   # if we're here, we found a panic
+-   echo "Failing due to panics detected in logs"
+-   docker-compose logs --no-color > /tmp/docker-compose.log
++if ! REKORTMPDIR=$REKORTMPDIR go test -count=1 -tags=e2e $(go list ./... | grep -v ./tests) ; then
+    exit 1
+ fi
+ 
+ echo "generating code coverage"
+-docker-compose restart rekor-server
+-
+-if ! docker cp $(docker ps -aqf "name=rekor_rekor-server"):go/rekor-server.cov /tmp/pkg-rekor-server.cov ; then
+-   # failed to copy code coverage report from server
+-   echo "Failed to retrieve server code coverage report"
+-   docker-compose logs --no-color > /tmp/docker-compose.log
+-   exit 1
+-fi
+-
+ # merging coverage reports and filtering out /pkg/generated from final report
+ hack/tools/bin/gocovmerge /tmp/pkg-rekor-*.cov | grep -v "/pkg/generated/" > /tmp/pkg-rekor-merged.cov
+ echo "code coverage $(go tool cover -func=/tmp/pkg-rekor-merged.cov | grep -E '^total\:' | sed -E 's/\s+/ /g')"
