@@ -69,7 +69,7 @@ git checkout origin/$midstream_ref $custom_files
 
 # Move overlays to root
 if [[ -d redhat/overlays ]]; then
-  cp -r redhat/overlays/* .
+  cp -Rp redhat/overlays/* .
 fi
 
 git add . # Adds applied patches
