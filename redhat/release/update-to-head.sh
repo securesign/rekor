@@ -53,44 +53,30 @@ robot_trigger_msg=":robot: triggering CI on branch '${redhat_ref}' after synchin
 # Reset release-next to upstream main or <git-ref>.
 git fetch upstream $upstream_ref
 if [[ "$upstream_ref" == "main" ]]; then
-  git checkout upstream/main -B ${redhat_ref}
+  git checkout upstream/main -B ${redhat_ref}-ci
 else
-  git checkout $upstream_ref -B ${redhat_ref}
+  git checkout $upstream_ref -B ${redhat_ref}-ci
 fi
+
+# RHTAP writes its pipeline files to the root of ${redhat_ref}
+# Fetch those from origin and merge them into the the ci branch
+git fetch origin $redhat_ref
+git merge origin/$redhat_ref --no-edit
 
 # Update redhat's main and take all needed files from there.
 git fetch origin $midstream_ref
 git checkout origin/$midstream_ref $custom_files
 
-# Apply midstream patches
-if [[ -d redhat/patches ]]; then
-  git apply redhat/patches/*
-fi
-
-# RHTAP writes its pipeline files to the root of ${redhat_ref}
-# Fetch those from origin and apply them to the the release branch
-# since we just wiped out our local copy with the upstream ref.
-git fetch origin $redhat_ref
-git checkout origin/$redhat_ref .tekton
-
 # Move overlays to root
 if [[ -d redhat/overlays ]]; then
-  if [[ -f redhat/overlays/Dockerfile ]]; then
-      git rm Dockerfile
-  fi
-  git mv redhat/overlays/* .
+  cp -Rp redhat/overlays/* .
 fi
 
 git add . # Adds applied patches
 git add $custom_files # Adds custom files
 git commit -m "${redhat_files_msg}"
 
-# Push the release-next branch
-git push -f origin "${redhat_ref}"
-
 # Trigger CI
-# TODO: Set up openshift or github CI to run on release-next-ci
-git checkout "${redhat_ref}" -B "${redhat_ref}"-ci
 date > ci
 git add ci
 git commit -m "${robot_trigger_msg}"
