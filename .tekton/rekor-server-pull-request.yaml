@@ -394,7 +394,7 @@ spec:
         - name: name
           value: build-test-image
         - name: bundle
-          value: quay.io/securesign/rekor-build-test-image@sha256:cb1f7f0f20929b6213e8fdcf987f9dea6f4cb6fa5c7132190edf28b0b9c92868
+          value: quay.io/securesign/rekor-build-test-image@sha256:44dade29f5022faff66eb552e1c1ba71698df8759b725f8550355ffcdd719709
         - name: kind
           value: task
         resolver: bundles
