@@ -37,7 +37,7 @@ RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 # overwrite server and include debugger
 COPY --from=builder /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
 
-FROM registry.access.redhat.com/ubi9/go-toolset@sha256:7e49e105a854749d67e5e02fb4069b48bd50445098c780b7f808cc351dee2589 as test
+FROM registry.access.redhat.com/ubi9/go-toolset@sha256:82d9bc5d3ceb43635288880f26207201e55d1c688a60ebbfff4f54d4963a62a1 as test
 
 USER root
 
