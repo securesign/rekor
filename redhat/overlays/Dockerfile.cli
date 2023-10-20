@@ -3,7 +3,7 @@ FROM registry.access.redhat.com/ubi9/go-toolset@sha256:82d9bc5d3ceb43635288880f2
 USER root
 RUN git config --global --add safe.directory /opt/app-root/src
 COPY . .
-RUN make rekor-cli
+RUN make cross-platform
 
 #Install stage
 FROM registry.access.redhat.com/ubi9/go-toolset@sha256:82d9bc5d3ceb43635288880f26207201e55d1c688a60ebbfff4f54d4963a62a1
@@ -15,8 +15,9 @@ LABEL io.openshift.tags="rekor-cli trusted-signer"
 LABEL summary="Provides the rekor CLI binary for interacting with a rekor server"
 LABEL com.redhat.component="rekor-cli"
 
-COPY --from=build-env /opt/app-root/src/rekor-cli /usr/local/bin/rekor-cli
+COPY --from=build-env /opt/app-root/src/rekor-cli-darwin-amd64 /usr/local/bin/rekor-cli-darwin-amd64
+COPY --from=build-env /opt/app-root/src/rekor-cli-linux-amd64 /usr/local/bin/rekor-cli-linux-amd64
+COPY --from=build-env /opt/app-root/src/rekor-cli-windows /usr/local/bin/rekor-cli-windows
 WORKDIR /opt/app-root/src/home
 
-#ENTRYPOINT
-ENTRYPOINT [ "rekor-cli" ]
+
