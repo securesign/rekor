@@ -65,6 +65,7 @@ spec:
       workingDir: $(workspaces.source.path)/source
       script: |
         #!/usr/bin/env sh
+        chmod +x ./e2e-test.sh
         ./e2e-test.sh
       resources:
         limits:

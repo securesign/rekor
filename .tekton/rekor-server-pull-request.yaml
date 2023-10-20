@@ -412,7 +412,7 @@ spec:
         - name: name
           value: rekor-e2e-test
         - name: bundle
-          value: quay.io/securesign/rekor-e2e-test@sha256:3ba372d298cf9109f5c573901d2ef5accfbbd3d168e9da2e90d758fdc63e4b4c
+          value: quay.io/securesign/rekor-e2e-test@sha256:2ef6fbab2f49508db9b999315792655ce732b876085d88c82227db8bbff9ee19
         - name: kind
           value: task
         resolver: bundles
