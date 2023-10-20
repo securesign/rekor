@@ -6,7 +6,7 @@ COPY . .
 
 RUN make Makefile.swagger
 RUN make -f Build.mak rekor-cli-darwin-amd64
-RUN make -f BUild.mak rekor-cli-linux-amd64
+RUN make -f Build.mak rekor-cli-linux-amd64
 RUN make -f Build.mak rekor-cli-windows
 
 
