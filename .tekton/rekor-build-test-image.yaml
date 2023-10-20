@@ -15,16 +15,16 @@ spec:
       securityContext:
         capabilities:
           add: ["SETFCAP"]
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/source
       image: quay.io/buildah/stable:v1
       volumeMounts:
         - name: docker-config-volume
-          mountPath: $(workspaces.source.path)/.docker
+          mountPath: $(workspaces.source.path)/source/.docker
         - name: varlibcontainers
           mountPath: /home/build/.local/share/containers
       env:
         - name: REGISTRY_AUTH_FILE
-          value: .docker/.dockercfg
+          value: .docker/.dockerconfigjson
       script: |
         buildah --storage-driver=vfs bud \
         --target=test --format=oci \
@@ -37,7 +37,7 @@ spec:
         docker://quay.io/securesign/rekor-server_test:latest
 
     - name: get-image-sha
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/source
       image: quay.io/skopeo/stable:v1
       script: |
         export IMAGE_DIGEST=$(skopeo inspect docker://quay.io/securesign/rekor-server_test:latest | grep -m1 '"Digest":' | awk -F'"' '{print $4}')

@@ -394,7 +394,7 @@ spec:
         - name: name
           value: build-test-image
         - name: bundle
-          value: quay.io/securesign/rekor-build-test-image@sha256:22556e3111166fc0404394ed2101d0bcde38db2ba9f06c795082f86216ceba23
+          value: quay.io/securesign/rekor-build-test-image@sha256:cb1f7f0f20929b6213e8fdcf987f9dea6f4cb6fa5c7132190edf28b0b9c92868
         - name: kind
           value: task
         resolver: bundles
@@ -412,7 +412,7 @@ spec:
         - name: name
           value: rekor-e2e-test
         - name: bundle
-          value: quay.io/securesign/rekor-e2e-test@sha256:0edf133224f34cee6873f0dca372c7bec58a651f30fd5556658712b59d71d66a
+          value: quay.io/securesign/rekor-e2e-test@sha256:3ba372d298cf9109f5c573901d2ef5accfbbd3d168e9da2e90d758fdc63e4b4c
         - name: kind
           value: task
         resolver: bundles

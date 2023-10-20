@@ -37,7 +37,7 @@ spec:
 
     - name: trillian-log-server
       image: quay.io/redhat-user-workloads/rhtas-tenant/rhtas-stack-1-0-beta/trillian-logserver:build-58a79-1696502872
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/source
       command: 
         - "/bin/sh"
         - "-c"
@@ -45,7 +45,7 @@ spec:
 
     - name: trillian-log-signer
       image: quay.io/redhat-user-workloads/rhtas-tenant/rhtas-stack-1-0-beta/trillian-logsigner:build-38813-1696586021
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/source
       command: 
         - "/bin/sh"
         - "-c"
@@ -53,7 +53,7 @@ spec:
 
     - name: rekor-server
       image: $(params.TEST_IMAGE_URL)
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/source
       command: 
         - "/bin/sh"
         - "-c"
@@ -62,10 +62,9 @@ spec:
   steps:
     - name: run-e2e-test
       image: $(params.TEST_IMAGE_URL)
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/source
       script: |
         #!/usr/bin/env sh
-        git config --global --add safe.directory /workspace/source
         ./e2e-test.sh
       resources:
         limits:
