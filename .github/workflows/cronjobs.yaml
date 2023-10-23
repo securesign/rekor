@@ -30,3 +30,49 @@ jobs:
         if: ${{ env.NUM_OPEN_PRS == 0 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  check-image-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Retrieve LATEST_SHA
+        run: |
+          LATEST_SHA=$(skopeo inspect --raw docker://registry.access.redhat.com/ubi9/go-toolset:latest | jq -r '.manifests[] | select(.platform.architecture == "amd64") .digest')
+          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
+
+      - name: Retrieve CURRENT_SHA
+        working-directory: redhat/overlays
+        run: |
+          CURRENT_SHA=$(grep FROM Dockerfile | awk '{print $2}' | awk -F '@' '{print $2; exit}')
+          echo "CURRENT_SHA=$CURRENT_SHA" >> $GITHUB_ENV
+
+      - name: Update image version
+        working-directory: redhat/overlays
+        if: ${{ env.LATEST_SHA != env.CURRENT_SHA }}
+        run: |
+          grep -rl $CURRENT_SHA . | xargs sed -i "s/$CURRENT_SHA/$LATEST_SHA/g"
+
+      - name: Commit and push changes
+        if: ${{ env.LATEST_SHA != env.CURRENT_SHA }}
+        run: |
+          # Configure git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Checkout update branch
+          git checkout -B Update-image-version
+
+          # Commit and push changes
+          git add .
+          git commit -m "Update image version"
+          git push origin Update-image-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create pull request
+        if: ${{ env.LATEST_SHA != env.CURRENT_SHA }}
+        run: |
+          gh pr create --title "Update image version" --body "This PR updates the image version to the latest SHA." --head Update-image-version --base main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
