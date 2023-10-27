@@ -9,6 +9,9 @@ RUN make -f Build.mak rekor-cli-darwin-amd64
 RUN make -f Build.mak rekor-cli-linux-amd64
 RUN make -f Build.mak rekor-cli-windows
 
+RUN gzip rekor_cli_darwin_amd64
+RUN gzip rekor_cli_linux_amd64
+RUN gzip rekor_cli_windows_amd64.exe
 
 #Install stage
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:b40f52aa68b29634ff45429ee804afbaa61b33de29ae775568933c71610f07a4
@@ -20,9 +23,9 @@ LABEL io.openshift.tags="rekor-cli trusted-signer"
 LABEL summary="Provides the rekor CLI binary for interacting with a rekor server"
 LABEL com.redhat.component="rekor-cli"
 
-COPY --from=build-env /opt/app-root/src/rekor_cli_darwin_amd64 /usr/local/bin/rekor_cli_darwin_amd64
-COPY --from=build-env /opt/app-root/src/rekor_cli_linux_amd64 /usr/local/bin/rekor_cli_linux_amd64
-COPY --from=build-env /opt/app-root/src/rekor_cli_windows_amd64.exe /usr/local/bin/rekor_cli_windows_amd64.exe
+COPY --from=build-env /opt/app-root/src/rekor_cli_darwin_amd64.gz /usr/local/bin/rekor_cli_darwin_amd64.gz
+COPY --from=build-env /opt/app-root/src/rekor_cli_linux_amd64.gz /usr/local/bin/rekor_cli_linux_amd64.gz
+COPY --from=build-env /opt/app-root/src/rekor_cli_windows_amd64.exe.gz /usr/local/bin/rekor_cli_windows_amd64.exe.gz
 WORKDIR /opt/app-root/src/home
 
 
