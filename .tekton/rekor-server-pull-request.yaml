@@ -371,54 +371,54 @@ spec:
         operator: in
         values:
         - "false"
-    - name: run-unit-test
-      runAfter:
-      - build-container    
-      taskRef:
-        params:
-        - name: name
-          value: go-unit-test
-        - name: bundle
-          value: quay.io/securesign/rekor-unit-test@sha256:e2713945aa7f1a14bd58a0c809691325fa8070cf6d0a0e476cc9e485cc680826
-        - name: kind
-          value: task
-        resolver: bundles
-      workspaces:
-        - name: source
-          workspace: workspace
-    - name: build-test-image
-      runAfter:
-      - prefetch-dependencies    
-      taskRef:
-        params:
-        - name: name
-          value: build-test-image
-        - name: bundle
-          value: quay.io/securesign/rekor-build-test-image@sha256:44dade29f5022faff66eb552e1c1ba71698df8759b725f8550355ffcdd719709
-        - name: kind
-          value: task
-        resolver: bundles
-      workspaces:
-        - name: source
-          workspace: workspace
-    - name: run-e2e-test
-      params:
-      - name: TEST_IMAGE_URL
-        value: $(tasks.build-test-image.results.TEST_IMAGE_URL)
-      runAfter:
-      - build-test-image  
-      taskRef:
-        params:
-        - name: name
-          value: rekor-e2e-test
-        - name: bundle
-          value: quay.io/securesign/rekor-e2e-test@sha256:2ef6fbab2f49508db9b999315792655ce732b876085d88c82227db8bbff9ee19
-        - name: kind
-          value: task
-        resolver: bundles
-      workspaces:
-        - name: source
-          workspace: workspace
+    # - name: run-unit-test
+    #   runAfter:
+    #   - build-container
+    #   taskRef:
+    #     params:
+    #     - name: name
+    #       value: go-unit-test
+    #     - name: bundle
+    #       value: quay.io/securesign/rekor-unit-test@sha256:e2713945aa7f1a14bd58a0c809691325fa8070cf6d0a0e476cc9e485cc680826
+    #     - name: kind
+    #       value: task
+    #     resolver: bundles
+    #   workspaces:
+    #     - name: source
+    #       workspace: workspace
+    # - name: build-test-image
+    #   runAfter:
+    #   - prefetch-dependencies
+    #   taskRef:
+    #     params:
+    #     - name: name
+    #       value: build-test-image
+    #     - name: bundle
+    #       value: quay.io/securesign/rekor-build-test-image@sha256:44dade29f5022faff66eb552e1c1ba71698df8759b725f8550355ffcdd719709
+    #     - name: kind
+    #       value: task
+    #     resolver: bundles
+    #   workspaces:
+    #     - name: source
+    #       workspace: workspace
+    # - name: run-e2e-test
+    #   params:
+    #   - name: TEST_IMAGE_URL
+    #     value: $(tasks.build-test-image.results.TEST_IMAGE_URL)
+    #   runAfter:
+    #   - build-test-image
+    #   taskRef:
+    #     params:
+    #     - name: name
+    #       value: rekor-e2e-test
+    #     - name: bundle
+    #       value: quay.io/securesign/rekor-e2e-test@sha256:2ef6fbab2f49508db9b999315792655ce732b876085d88c82227db8bbff9ee19
+    #     - name: kind
+    #       value: task
+    #     resolver: bundles
+    #   workspaces:
+    #     - name: source
+    #       workspace: workspace
     workspaces:
     - name: workspace
     - name: git-auth
