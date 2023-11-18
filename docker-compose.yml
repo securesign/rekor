@@ -31,15 +31,7 @@ services:
       retries: 3
       start_period: 10s
   redis-server:
-    image: docker.io/redis:6.2
-    command: [
-      "--bind",
-      "0.0.0.0",
-      "--appendonly",
-      "yes",
-      "--requirepass",
-      "test"
-    ]
+    image: registry.redhat.io/rhel9/redis-6@sha256:031a5a63611e1e6a9fec47492a32347417263b79ad3b63bcee72fc7d02d64c94
     ports:
       - "6379:6379"
     restart: always # keep the redis server running
