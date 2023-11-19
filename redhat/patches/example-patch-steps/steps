@@ -1,0 +1,19 @@
+# This script is how I generated the patch, should help explain if someone else has to do this
+
+# 1: bring down the base version securesign makefile 
+curl -sL https://raw.githubusercontent.com/securesign/rekor/redhat-v1.2.2/Makefile -o ./redhat-makefile-v1.2.2
+
+# 2: bring down the upgraded version sigstore makefile
+curl -sL https://raw.githubusercontent.com/sigstore/rekor/v1.3.3/Makefile -o ./sigstore-makefile-v1.3.3
+
+# 3. bring in the existing patchfile
+curl -sL https://raw.githubusercontent.com/securesign/rekor/c12ebada8f0a34d5e5dd92728e9216670837ef1b/redhat/patches/0002-makefile.patch -o ./redhat-makefile-patch-v1.2.2.patch
+
+# 4. patch the old version of the securesign makefile
+patch -b < ./redhat-makefile-patch-v1.2.2.patch
+    # 4.5. enter the old makefile: ./redhat-makefile-v1.2.2
+
+# now that the file has been patched, rename it
+mv ./redhat-makefile-v1.2.2 ./patched-makefile
+
+diff -u ./sigstore-makefile-v1.3.3 ./patched-makefile > ./0003-makefile.patch
