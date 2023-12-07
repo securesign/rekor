@@ -70,5 +70,3 @@ spec:
 # This file bundles the e2e tests for rekor. 
 # If any changes are made to this file, it must be pushed to Quay using the following command:
 # 'tkn bundle push quay.io/securesign/rekor-e2e-test:latest -f .tekton/rekor-e2e-test.yaml'.
-# This will generate a new SHA for the bundle. 
-# Ensure that this new SHA is updated in the pull and push pipeline files for each component.

@@ -398,6 +398,39 @@ spec:
       workspaces:
         - name: source
           workspace: workspace
+    - name: build-test-image
+      runAfter:
+      - prefetch-dependencies
+      taskRef:
+        params:
+        - name: name
+          value: build-test-image
+        - name: bundle
+          value: quay.io/securesign/rekor-build-test-image:latest
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+        - name: source
+          workspace: workspace
+    - name: run-e2e-test
+      params:
+      - name: TEST_IMAGE_URL
+        value: $(tasks.build-test-image.results.TEST_IMAGE_URL)
+      runAfter:
+      - build-test-image
+      taskRef:
+        params:
+        - name: name
+          value: rekor-e2e-test
+        - name: bundle
+          value: quay.io/securesign/rekor-e2e-test:latest
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+        - name: source
+          workspace: workspace
     workspaces:
     - name: workspace
     - name: git-auth

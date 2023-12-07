@@ -1,0 +1,55 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-test-image
+  annotations:
+    tekton.dev/title: "Build a test image for rekor-server"
+spec:
+  workspaces:
+    - name: source
+  results:
+    - name: TEST_IMAGE_URL
+      description: The reference of the built image.
+  steps:
+    - name: build-and-push-test-image
+      securityContext:
+        capabilities:
+          add: ["SETFCAP"]
+      workingDir: $(workspaces.source.path)
+      image: quay.io/buildah/stable:v1
+      volumeMounts:
+        - name: docker-config-volume
+          mountPath: $(workspaces.source.path)/.docker
+        - name: varlibcontainers
+          mountPath: /home/build/.local/share/containers
+      env:
+        - name: REGISTRY_AUTH_FILE
+          value: .docker/.dockerconfigjson
+      script: |
+        buildah --storage-driver=vfs bud \
+        --target=test --format=oci \
+        --tls-verify=true --no-cache \
+        -f source/Dockerfile -t quay.io/securesign/rekor-server_test:latest source
+
+        buildah --storage-driver=vfs push \
+        --tls-verify=true \
+        quay.io/securesign/rekor-server_test:latest \
+        docker://quay.io/securesign/rekor-server_test:latest
+
+    - name: get-image-sha
+      workingDir: $(workspaces.source.path)
+      image: quay.io/skopeo/stable:v1
+      script: |
+        export IMAGE_DIGEST=$(skopeo inspect docker://quay.io/securesign/rekor-server_test:latest | grep -m1 '"Digest":' | awk -F'"' '{print $4}')
+        echo -n "quay.io/securesign/rekor-server_test@$IMAGE_DIGEST" > $(results.TEST_IMAGE_URL.path)
+
+  volumes:
+    - name: docker-config-volume
+      secret:
+        secretName: rekor-test-build-secret
+    - name: varlibcontainers
+      emptyDir: {}
+
+# This file bundles the builds for the rekor test image .
+# If any changes are made to this file, it must be pushed to Quay using the following command:
+# 'tkn bundle push quay.io/securesign/rekor-build-test-image:latest -f .tekton/rekor-build-test-image.yaml'.
