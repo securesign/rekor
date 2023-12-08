@@ -20,15 +20,19 @@ spec:
       volumeMounts:
         - name: docker-config-volume
           mountPath: $(workspaces.source.path)/.docker
+        - name: brew-config-volume
+          mountPath: $(workspaces.source.path)/.brew_auth
         - name: varlibcontainers
           mountPath: /home/build/.local/share/containers
       env:
         - name: REGISTRY_AUTH_FILE
           value: .docker/.dockerconfigjson
       script: |
+        #!/usr/bin/env sh
         buildah --storage-driver=vfs bud \
         --target=test --format=oci \
         --tls-verify=true --no-cache \
+        --authfile .brew_auth/.dockerconfigjson \
         -f source/Dockerfile -t quay.io/securesign/rekor-server_test:latest source
 
         buildah --storage-driver=vfs push \
@@ -47,9 +51,11 @@ spec:
     - name: docker-config-volume
       secret:
         secretName: rekor-test-build-secret
+    - name: brew-config-volume
+      secret:
+        secretName: brew-registry-pull-secret
     - name: varlibcontainers
       emptyDir: {}
-
 # This file bundles the builds for the rekor test image .
 # If any changes are made to this file, it must be pushed to Quay using the following command:
 # 'tkn bundle push quay.io/securesign/rekor-build-test-image:latest -f .tekton/rekor-build-test-image.yaml'.
