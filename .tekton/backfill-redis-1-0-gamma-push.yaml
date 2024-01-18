@@ -382,7 +382,7 @@ spec:
         - name: name
           value: go-unit-test
         - name: bundle
-          value: quay.io/securesign/rekor-unit-test:latest
+          value: quay.io/securesign/rekor-unit-test@sha256:307f0109abd7721fa341314cc8c6a704b06154c010daf1f4b4548af178e7ff5a
         - name: kind
           value: task
         resolver: bundles

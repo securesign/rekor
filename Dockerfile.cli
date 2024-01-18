@@ -25,7 +25,7 @@ RUN git stash && \
     gzip rekor_cli_linux_arm64 && \
     gzip rekor_cli_linux_ppc64le && \
     gzip rekor_cli_linux_s390x
-
+#
 #Install stage
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:b7a3642d6245446da03d14482740be5f2fe58f30b9dfe001e89a39071a50edfc
 
