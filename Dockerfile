@@ -35,13 +35,13 @@ RUN CGO_ENABLED=0 go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o 
 RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test -mod=readonly ./cmd/rekor-server
 
 # debug compile options & debugger
-FROM registry.access.redhat.com/ubi9/go-toolset@sha256:f5001c30e7ee626d87ca3cbf5606f401e637ecd50aa12023862a9119ede9ffb9 as debug
+FROM registry.access.redhat.com/ubi9/go-toolset@sha256:330c52d81d5bde432fb59c4943fcb5143940ceb460f99c1ac8e0a9ea1f8f77e8 as debug
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 
 # overwrite server and include debugger
 COPY --from=build-env /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
 
-FROM registry.access.redhat.com/ubi9/go-toolset@sha256:f5001c30e7ee626d87ca3cbf5606f401e637ecd50aa12023862a9119ede9ffb9 as test
+FROM registry.access.redhat.com/ubi9/go-toolset@sha256:330c52d81d5bde432fb59c4943fcb5143940ceb460f99c1ac8e0a9ea1f8f77e8 as test
 
 USER root
 
@@ -60,7 +60,7 @@ RUN mkdir -p /var/run/attestations && \
 COPY --from=build-env /opt/app-root/src/rekor-server_test /usr/local/bin/rekor-server
 
 # Multi-Stage production build
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:b7a3642d6245446da03d14482740be5f2fe58f30b9dfe001e89a39071a50edfc as deploy
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:06d06f15f7b641a78f2512c8817cbecaa1bf549488e273f5ac27ff1654ed33f0 as deploy
 
 LABEL description="Rekor aims to provide an immutable, tamper-resistant ledger of metadata generated within a software project’s supply chain."
 LABEL io.k8s.description="Rekor-Server provides a tamper resistant ledger."
