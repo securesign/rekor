@@ -6,7 +6,7 @@ COPY . .
 RUN make backfill-redis
 
 #Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:3e313209ac617a92b50350286752311d99ea2dafc429ef0e5311889294b0bc21
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:06d06f15f7b641a78f2512c8817cbecaa1bf549488e273f5ac27ff1654ed33f0
 COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
 WORKDIR /opt/app-root/src/home
 
