@@ -7,13 +7,13 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "redhat-v1.3"
+      == "main"
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: rekor-1-0-gamma
-    appstudio.openshift.io/component: backfill-redis-1-0-gamma
+    appstudio.openshift.io/application: rekor
+    appstudio.openshift.io/component: backfill-redis
     pipelines.appstudio.openshift.io/type: build
-  name: backfill-redis-1-0-gamma-on-push
+  name: backfill-redis-on-push
   namespace: rhtas-tenant
 spec:
   params:
@@ -22,7 +22,7 @@ spec:
   - name: git-url
     value: '{{repo_url}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/rhtas-tenant/rekor-1-0-gamma/backfill-redis-1-0-gamma:{{revision}}
+    value: quay.io/redhat-user-workloads/rhtas-tenant/rekor/backfill-redis:{{revision}}
   - name: path-context
     value: .
   - name: revision
