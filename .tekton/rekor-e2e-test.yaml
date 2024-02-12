@@ -1,0 +1,72 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: rekor-e2e-test
+  annotations:
+    tekton.dev/title: "Rekor e2e test"
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: TEST_IMAGE_URL
+      type: string
+      description: The image url for the test image
+      default: ""
+
+  sidecars:
+    - name: mysql
+      image: quay.io/redhat-user-workloads/rhtas-tenant/rhtas-stack-1-0-beta/trillian-database:0870a57daf2b2cca85219e76064606969c0369df
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: zaphod
+        - name: MYSQL_DATABASE
+          value: test
+        - name: MYSQL_USER
+          value: test
+        - name: MYSQL_PASSWORD
+          value: zaphod
+
+    - name: redis-server
+      image: registry.redhat.io/rhel9/redis-6@sha256:91b755b9fb09b7299896f9a90f7d2752fdba36a8e6e9b9d1ddc17f3f92466745
+
+    - name: trillian-log-server
+      image: quay.io/redhat-user-workloads/rhtas-tenant/trillian-1-0-gamma/trillian-logserver-1-5:b0fbe2d8a36ceb49d83536fe59d00dc48e055901
+      workingDir: $(workspaces.source.path)/source
+      command: 
+        - "/bin/sh"
+        - "-c"
+        - 'sleep 60 && /trillian_log_server --storage_system=mysql --mysql_uri="test:zaphod@tcp(127.0.0.1:3306)/test" --rpc_endpoint=0.0.0.0:8090 --http_endpoint=0.0.0.0:8091 --alsologtostderr'
+
+    - name: trillian-log-signer
+      image: quay.io/redhat-user-workloads/rhtas-tenant/trillian-1-0-gamma/trillian-logsigner-1-5:b0fbe2d8a36ceb49d83536fe59d00dc48e055901
+      workingDir: $(workspaces.source.path)/source
+      command: 
+        - "/bin/sh"
+        - "-c"
+        - 'sleep 60 && /trillian_log_signer --force_master --storage_system=mysql --mysql_uri="test:zaphod@tcp(127.0.0.1:3306)/test" --rpc_endpoint=0.0.0.0:8092 --http_endpoint=0.0.0.0:8093 --alsologtostderr'
+
+    - name: rekor-server
+      image: $(params.TEST_IMAGE_URL)
+      workingDir: $(workspaces.source.path)/source
+      command: 
+        - "/bin/sh"
+        - "-c"
+        - "sleep 80 && rekor-server -test.coverprofile=rekor-server.cov serve --trillian_log_server.address=127.0.0.1 --trillian_log_server.port=8090 --redis_server.address=127.0.0.1 --redis_server.port=6379 --rekor_server.address=0.0.0.0 --rekor_server.signer=memory --enable_attestation_storage --attestation_storage_bucket=file:///var/run/attestations --max_request_body_size=32792576"
+                
+  steps:
+    - name: run-e2e-test
+      image: $(params.TEST_IMAGE_URL)
+      workingDir: $(workspaces.source.path)/source
+      script: |
+        #!/usr/bin/env sh
+        chmod +x ./e2e-test.sh
+        ./e2e-test.sh
+      resources:
+        limits:
+          memory: 3Gi
+        requests:
+          memory: 512Mi
+
+# This file bundles the e2e tests for rekor. 
+# If any changes are made to this file, it must be pushed to Quay using the following command:
+# 'tkn bundle push quay.io/securesign/rekor-e2e-test:latest -f .tekton/rekor-e2e-test.yaml'.
