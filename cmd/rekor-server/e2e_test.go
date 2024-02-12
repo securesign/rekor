@@ -35,6 +35,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"os/exec"
 
 	"github.com/sigstore/rekor/pkg/sharding"
 
@@ -226,8 +227,24 @@ func TestSearchNoEntriesRC1(t *testing.T) {
 	util.RunCliErr(t, "search", "--email", "noone@internetz.com")
 }
 func TestHostnameInSTH(t *testing.T) {
-	// get ID of container
-	rekorContainerID := strings.Trim(util.Run(t, "", "docker", "ps", "-q", "-f", "name=rekor-server"), "\n")
+	var rekorContainerID string
+
+	// Check if Docker is running
+	cmd := exec.Command("docker", "info")
+	err := cmd.Run()
+
+	if err != nil {
+		cmd := exec.Command("uname", "-n")
+		output, err := cmd.Output()
+		if err != nil {
+			t.Fatalf("Failed to get hostname: %v", err)
+		}
+		rekorContainerID = strings.Trim(string(output), "\n")
+	} else {
+		// If Docker is running, get the container ID of rekor-server
+		rekorContainerID = strings.Trim(util.Run(t, "", "docker", "ps", "-q", "-f", "name=rekor-server"), "\n")
+	}
+
 	resp, err := http.Get(fmt.Sprintf("%s/api/v1/log", rekorServer()))
 	if err != nil {
 		t.Fatal(err)
