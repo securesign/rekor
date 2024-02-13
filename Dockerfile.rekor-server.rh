@@ -72,5 +72,5 @@ LABEL com.redhat.component="rekor-server"
 # Retrieve the binary from the previous stage
 COPY --from=build-env /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
 
-# Set the binary as the entrypoint of the container
+# Set the binary as the entrypoint of the container#
 ENTRYPOINT ["rekor-server"]
