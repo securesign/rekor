@@ -33,7 +33,7 @@ spec:
         --target=test --format=oci \
         --tls-verify=true --no-cache \
         --authfile .brew_auth/.dockerconfigjson \
-        -f source/Dockerfile -t quay.io/securesign/rekor-server_test:latest source
+        -f source/Dockerfile.rekor-server.rh -t quay.io/securesign/rekor-server_test:latest source
 
         buildah --storage-driver=vfs push \
         --tls-verify=true \
