@@ -17,9 +17,10 @@ FROM golang:1.21.6@sha256:7b575fe0d9c2e01553b04d9de8ffea6d35ca3ab3380d2a8db2acc8
 ENV APP_ROOT=/opt/app-root
 ENV GOPATH=$APP_ROOT
 
+
 WORKDIR $APP_ROOT/src/
 ADD go.mod go.sum $APP_ROOT/src/
-RUN go mod download
+RUN CGO_ENABLED=0 go mod download
 
 # Add source code
 ADD ./cmd/ $APP_ROOT/src/cmd/
@@ -40,12 +41,42 @@ COPY --from=builder /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
 CMD ["rekor-server", "serve"]
 
 # debug compile options & debugger
-FROM deploy as debug
-RUN go install github.com/go-delve/delve/cmd/dlv@v1.21.0
+FROM registry.access.redhat.com/ubi9/go-toolset@sha256:330c52d81d5bde432fb59c4943fcb5143940ceb460f99c1ac8e0a9ea1f8f77e8 as debug
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 
 # overwrite server and include debugger
-COPY --from=builder /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
+COPY --from=build-env /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
 
-FROM deploy as test
+FROM registry.access.redhat.com/ubi9/go-toolset@sha256:330c52d81d5bde432fb59c4943fcb5143940ceb460f99c1ac8e0a9ea1f8f77e8 as test
+
+USER root
+
+# Extract the x86_64 minisign binary to /usr/local/bin/
+RUN curl -LO https://github.com/jedisct1/minisign/releases/download/0.11/minisign-0.11-linux.tar.gz && \
+    tar -xzf minisign-0.11-linux.tar.gz minisign-linux/x86_64/minisign -O > /usr/local/bin/minisign && \
+    chmod +x /usr/local/bin/minisign && \
+    rm minisign-0.11-linux.tar.gz
+
+# Create test directory
+RUN mkdir -p /var/run/attestations && \
+    touch /var/run/attestations/attestation.json && \
+    chmod 777 /var/run/attestations/attestation.json
+
 # overwrite server with test build with code coverage
-COPY --from=builder /opt/app-root/src/rekor-server_test /usr/local/bin/rekor-server
+COPY --from=build-env /opt/app-root/src/rekor-server_test /usr/local/bin/rekor-server
+
+# Multi-Stage production build
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:06d06f15f7b641a78f2512c8817cbecaa1bf549488e273f5ac27ff1654ed33f0 as deploy
+
+LABEL description="Rekor aims to provide an immutable, tamper-resistant ledger of metadata generated within a software project’s supply chain."
+LABEL io.k8s.description="Rekor-Server provides a tamper resistant ledger."
+LABEL io.k8s.display-name="Rekor-Server container image for Red Hat Trusted Signer"
+LABEL io.openshift.tags="rekor-server trusted-signer"
+LABEL summary="Provides the rekor Server binary for running Rekor-Server"
+LABEL com.redhat.component="rekor-server"
+
+# Retrieve the binary from the previous stage
+COPY --from=build-env /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
+
+# Set the binary as the entrypoint of the container
+ENTRYPOINT ["rekor-server"]

@@ -1,0 +1,29 @@
+# Build stage
+
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.21@sha256:98a0ff138c536eee98704d6909699ad5d0725a20573e2c510a60ef462b45cce0 AS build-env
+USER root
+RUN mkdir /opt/app-root && mkdir /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
+
+WORKDIR /opt/app-root/src/
+COPY . .
+
+RUN CGO_ENABLED=0 go mod download
+
+
+ARG SERVER_LDFLAGS
+RUN CGO_ENABLED=0 go build -mod=readonly -trimpath -ldflags "$(SERVER_LDFLAGS)" -o backfill-redis ./cmd/backfill-redis
+
+# Install stage
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:06d06f15f7b641a78f2512c8817cbecaa1bf549488e273f5ac27ff1654ed33f0
+COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
+WORKDIR /opt/app-root/src/home
+
+LABEL description="Backfillredis is a job that will go through the TLog and make sure that missing entries are added to the search index."
+LABEL io.k8s.description="Backfillredis is a job that will go through the TLog and make sure that missing entries are added to the search index."
+LABEL io.k8s.display-name="Backfillredis container image for Red Hat Trusted Signer"
+LABEL io.openshift.tags="backfill-redis trusted-signer"
+LABEL summary="Provides the backfill-redis binary for a rekor server"
+LABEL com.redhat.component="backfill-redis"
+#
+#ENTRYPOINT
+ENTRYPOINT [ "backfill-redis" ]
