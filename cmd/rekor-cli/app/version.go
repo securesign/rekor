@@ -16,7 +16,7 @@
 package app
 
 import (
-	"sigs.k8s.io/release-utils/version"
+	version "github.com/securesign/rekor/cmd/rekor-cli/app/version"
 )
 
 func init() {
