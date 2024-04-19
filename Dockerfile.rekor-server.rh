@@ -68,6 +68,7 @@ LABEL io.k8s.display-name="Rekor-Server container image for Red Hat Trusted Sign
 LABEL io.openshift.tags="rekor-server trusted-signer"
 LABEL summary="Provides the rekor Server binary for running Rekor-Server"
 LABEL com.redhat.component="rekor-server"
+LABEL name="rekor-server"
 
 # Retrieve the binary from the previous stage
 COPY --from=build-env /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
