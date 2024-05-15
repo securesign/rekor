@@ -36,7 +36,7 @@ var (
 	logType     string
 	enablePprof bool
 	// these map to the operationId as defined in openapi.yaml file
-	operationIds = []string{
+	operationIDs = []string{
 		"searchIndex",
 		"getLogInfo",
 		"getPublicKey",
@@ -115,12 +115,14 @@ Memory and file-based signers should only be used for testing.`)
 	rootCmd.PersistentFlags().String("redis_server.address", "127.0.0.1", "Redis server address")
 	rootCmd.PersistentFlags().Uint16("redis_server.port", 6379, "Redis server port")
 	rootCmd.PersistentFlags().String("redis_server.password", "", "Redis server password")
+	rootCmd.PersistentFlags().Bool("redis_server.enable-tls", false, "Whether to enable TLS verification when connecting to Redis endpoint")
+	rootCmd.PersistentFlags().Bool("redis_server.insecure-skip-verify", false, "Whether to skip TLS verification when connecting to Redis endpoint, only applicable when 'redis_server.enable-tls' is set to 'true'")
 
 	rootCmd.PersistentFlags().Bool("enable_attestation_storage", false, "enables rich attestation storage")
 	rootCmd.PersistentFlags().String("attestation_storage_bucket", "", "url for attestation storage bucket")
 	rootCmd.PersistentFlags().Int("max_attestation_size", 100*1024, "max size for attestation storage, in bytes")
 
-	rootCmd.PersistentFlags().StringSlice("enabled_api_endpoints", operationIds, "list of API endpoints to enable using operationId from openapi.yaml")
+	rootCmd.PersistentFlags().StringSlice("enabled_api_endpoints", operationIDs, "list of API endpoints to enable using operationId from openapi.yaml")
 
 	rootCmd.PersistentFlags().Uint64("max_request_body_size", 0, "maximum size for HTTP request body, in bytes; set to 0 for unlimited")
 	rootCmd.PersistentFlags().Uint64("max_jar_metadata_size", 1048576, "maximum permitted size for jar META-INF/ files, in bytes; set to 0 for unlimited")
