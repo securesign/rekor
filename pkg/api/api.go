@@ -22,6 +22,8 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/google/trillian"
@@ -29,6 +31,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/sigstore/rekor/pkg/indexstorage"
@@ -51,7 +54,25 @@ func dial(ctx context.Context, rpcServer string) (*grpc.ClientConn, error) {
 	defer cancel()
 
 	// Set up and test connection to rpc server
-	creds := insecure.NewCredentials()
+	var creds credentials.TransportCredentials
+	tlsCACertFile := viper.GetString("tls-ca-cert")
+	if tlsCACertFile == "" {
+		creds = insecure.NewCredentials()
+	} else {
+		tlsCaCert, err := os.ReadFile(filepath.Clean(tlsCACertFile))
+		if err != nil {
+			log.Logger.Fatalf("Failed to load tls-ca-cert:", err)
+		}
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(tlsCaCert) {
+			return nil, fmt.Errorf("failed to append CA certificate to pool")
+		}
+		creds = credentials.NewTLS(&tls.Config{
+			ServerName: rpcServer,
+			RootCAs:    certPool,
+		})
+	}
+
 	conn, err := grpc.DialContext(ctx, rpcServer, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Logger.Fatalf("Failed to connect to RPC server:", err)
