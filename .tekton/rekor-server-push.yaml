@@ -23,7 +23,7 @@ spec:
   - name: git-url
     value: '{{repo_url}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/rhtas-tenant/rekor/rekor-server:{{revision}}
+    value: quay.io/securesign/rekor-server:{{revision}}
   - name: path-context
     value: .
   - name: revision
