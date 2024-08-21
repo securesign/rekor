@@ -22,13 +22,16 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"fmt"
-	"time"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/google/trillian"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/sigstore/rekor/pkg/indexstorage"
@@ -46,13 +49,41 @@ import (
 	_ "github.com/sigstore/rekor/pkg/pubsub/gcp" // Load GCP pubsub implementation
 )
 
-func dial(ctx context.Context, rpcServer string) (*grpc.ClientConn, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
+func dial(rpcServer string) (*grpc.ClientConn, error) {
+	// Extract the hostname without the port
+	hostname := rpcServer
+	if idx := strings.Index(rpcServer, ":"); idx != -1 {
+		hostname = rpcServer[:idx]
+	}
 	// Set up and test connection to rpc server
-	creds := insecure.NewCredentials()
-	conn, err := grpc.DialContext(ctx, rpcServer, grpc.WithTransportCredentials(creds))
+	var creds credentials.TransportCredentials
+	tlsCACertFile := viper.GetString("trillian_log_server.tls_ca_cert")
+	useSystemTrustStore := viper.GetBool("trillian_log_server.tls")
+
+	switch {
+	case useSystemTrustStore:
+		creds = credentials.NewTLS(&tls.Config{
+			ServerName: hostname,
+			MinVersion: tls.VersionTLS12,
+		})
+	case tlsCACertFile != "":
+		tlsCaCert, err := os.ReadFile(filepath.Clean(tlsCACertFile))
+		if err != nil {
+			log.Logger.Fatalf("Failed to load tls_ca_cert:", err)
+		}
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(tlsCaCert) {
+			return nil, fmt.Errorf("failed to append CA certificate to pool")
+		}
+		creds = credentials.NewTLS(&tls.Config{
+			ServerName: hostname,
+			RootCAs:    certPool,
+			MinVersion: tls.VersionTLS12,
+		})
+	default:
+		creds = insecure.NewCredentials()
+	}
+	conn, err := grpc.NewClient(rpcServer, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Logger.Fatalf("Failed to connect to RPC server:", err)
 	}
@@ -78,7 +109,7 @@ func NewAPI(treeID uint) (*API, error) {
 		viper.GetString("trillian_log_server.address"),
 		viper.GetUint("trillian_log_server.port"))
 	ctx := context.Background()
-	tConn, err := dial(ctx, logRPCServer)
+	tConn, err := dial(logRPCServer)
 	if err != nil {
 		return nil, fmt.Errorf("dial: %w", err)
 	}
