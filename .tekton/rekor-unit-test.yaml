@@ -5,16 +5,42 @@ metadata:
   annotations:
     tekton.dev/title: "Go Unit Test Task"
 spec:
-  workspaces:
-    - name: source
+  params:
+    - description: The trusted artifact URI containing the application source code.
+      name: SOURCE_ARTIFACT
+      type: string
+    - description: The Trusted Artifact URI pointing to the artifact with the prefetched dependencies.
+      name: CACHI2_ARTIFACT
+      type: string
+      default: ""
+  stepTemplate:
+    volumeMounts:
+      - mountPath: /var/workdir
+        name: workdir
+      # This path is hard coded in the cachi2.env file.
+      - mountPath: /cachi2
+        name: cachi2
+    securityContext:
+      # This is needed because the different steps in this Task run with different user IDs.
+      runAsUser: 0
   steps:
+    - image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:4e39fb97f4444c2946944482df47b39c5bbc195c54c6560b0647635f553ab23d
+      name: use-trusted-artifact
+      args:
+        - use
+        - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+        - $(params.CACHI2_ARTIFACT)=/cachi2
     - name: run-tests
       image: registry.access.redhat.com/ubi9/go-toolset@sha256:5049a9d9be3914049aa983b66c695047d87c248f5fc95a222a63a15578a376bc
-      workingDir: $(workspaces.source.path)/source
+      workingDir: /var/workdir/source
       script: |
         #!/usr/bin/env sh
+        if [ -f "/cachi2/cachi2.env" ]; then
+          source "/cachi2/cachi2.env"
+        fi
         go test ./...
-
-# This file bundles the unit tests for rekor. 
-# If any changes are made to this file, it must be pushed to Quay using the following command:
-# 'tkn bundle push quay.io/securesign/rekor-unit-test:latest -f .tekton/rekor-unit-test.yaml'.
+  volumes:
+    - name: workdir
+      emptyDir: {}
+    - name: cachi2
+      emptyDir: {}
