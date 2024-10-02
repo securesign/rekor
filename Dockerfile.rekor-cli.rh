@@ -12,9 +12,10 @@ WORKDIR /opt/app-root/src/hack/tools
 RUN go mod vendor
 
 WORKDIR /opt/app-root/src
-RUN git stash && \
+RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
     export GIT_VERSION=$(git describe --tags --always --dirty) && \
-    git stash pop && \
+    export GIT_HASH=$(git rev-parse HEAD) && \
+    export BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && \
     go mod vendor && \
     make Makefile.swagger && \
     make -f Build.mak cross-platform && \
@@ -24,8 +25,9 @@ RUN git stash && \
     gzip rekor_cli_darwin_arm64 && \
     gzip rekor_cli_linux_arm64 && \
     gzip rekor_cli_linux_ppc64le && \
-    gzip rekor_cli_linux_s390x
-#
+    gzip rekor_cli_linux_s390x && \
+    git update-index --no-assume-unchanged Dockerfile.rekor-cli.rh
+
 #Install stage
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:73f7dcacb460dad137a58f24668470a5a2e47378838a0190eef0ab532c6e8998
 
