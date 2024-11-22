@@ -35,6 +35,17 @@ spec:
     value: [{"path": ".", "type": "gomod"}, {"path": "./hack/tools", "type": "gomod"}]
   - name: go_unit_test
     value: true
+  taskRunSpecs:
+    - pipelineTaskName: prefetch-dependencies
+      stepSpecs:
+        - name: prefetch-dependencies
+          computeResources:
+            requests:
+              cpu: '3'
+              memory: 3Gi
+            limits:
+              cpu: '3'
+              memory: 3Gi
   pipelineRef:
     resolver: git
     params:
