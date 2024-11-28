@@ -6,7 +6,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "main"
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "main"  &&
+      ( "Dockerfile.backfill-redis.rh".pathChanged() || ".tekton/backfill-redis-push.yaml".pathChanged() || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged() || "cmd/backfill-redis".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged() )
     build.appstudio.openshift.io/build-nudge-files: "controllers/constants/*"
   creationTimestamp: null
   labels:
