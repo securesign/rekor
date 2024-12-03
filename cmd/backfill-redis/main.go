@@ -37,6 +37,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/go-openapi/runtime"
@@ -65,17 +66,22 @@ import (
 )
 
 var (
-	redisHostname      = flag.String("hostname", "", "Hostname for Redis application")
-	redisPort          = flag.String("port", "", "Port to Redis application")
-	redisPassword      = flag.String("password", "", "Password for Redis authentication")
-	startIndex         = flag.Int("start", -1, "First index to backfill")
-	endIndex           = flag.Int("end", -1, "Last index to backfill")
-	enableTLS          = flag.Bool("enable-tls", false, "Enable TLS for Redis client")
-	insecureSkipVerify = flag.Bool("insecure-skip-verify", false, "Whether to skip TLS verification for Redis client or not")
-	rekorAddress       = flag.String("rekor-address", "", "Address for Rekor, e.g. https://rekor.sigstore.dev")
-	versionFlag        = flag.Bool("version", false, "Print the current version of Backfill Redis")
-	concurrency        = flag.Int("concurrency", 1, "Number of workers to use for backfill")
-	dryRun             = flag.Bool("dry-run", false, "Dry run - don't actually insert into Redis")
+	redisHostname          = flag.String("hostname", "", "Hostname for Redis application")
+	redisPort              = flag.String("port", "", "Port to Redis application")
+	redisPassword          = flag.String("password", "", "Password for Redis authentication")
+	startIndex             = flag.Int("start", -1, "First index to backfill")
+	endIndex               = flag.Int("end", -1, "Last index to backfill")
+	enableTLS              = flag.Bool("enable-tls", false, "Enable TLS for Redis client")
+	insecureSkipVerify     = flag.Bool("insecure-skip-verify", false, "Whether to skip TLS verification for Redis client or not")
+	rekorAddress           = flag.String("rekor-address", "", "Address for Rekor, e.g. https://rekor.sigstore.dev")
+	versionFlag            = flag.Bool("version", false, "Print the current version of Backfill Redis")
+	concurrency            = flag.Int("concurrency", 1, "Number of workers to use for backfill")
+	dryRun                 = flag.Bool("dry-run", false, "Dry run - don't actually insert into Redis")
+	enableRedisIndexResume = flag.Bool("enable-redis-index-resume", false, "Enable resuming from the last processed index stored in Redis. When enabled, the '--start' flag becomes optional for the Redis provider.")
+)
+
+const (
+	redisLastProcessedIndexKey = "last_processed_index"
 )
 
 func main() {
@@ -93,7 +99,10 @@ func main() {
 	if *redisPort == "" {
 		log.Fatal("port must be set")
 	}
-	if *startIndex == -1 {
+	if *enableRedisIndexResume && *startIndex != -1 {
+		log.Fatal("enableRedisIndexResume and startIndex cannot be set simultaneously")
+	}
+	if *startIndex == -1 && !*enableRedisIndexResume {
 		log.Fatal("start must be set to >=0")
 	}
 	if *endIndex == -1 {
@@ -115,6 +124,20 @@ func main() {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	group, ctx := errgroup.WithContext(ctx)
 	group.SetLimit(*concurrency)
+
+	var lastFilled int
+	if *enableRedisIndexResume && !*dryRun {
+		lastFilled, err = getLastFilledIndex(ctx, redisClient)
+		if err != nil {
+			log.Fatalf("Failed to retrieve last filled index: %v", err)
+		}
+		if lastFilled == -1 {
+			log.Printf("%s not found creating entry", redisLastProcessedIndexKey)
+			*startIndex = 0
+		} else {
+			*startIndex = lastFilled + 1 // +1 to avoid refilling the last filled index
+		}
+	}
 
 	type result struct {
 		index      int
@@ -194,6 +217,13 @@ func main() {
 			return nil
 		})
 	}
+
+	if *enableRedisIndexResume && !*dryRun {
+		if err := setLastFilledIndex(ctx, redisClient, *endIndex); err != nil {
+			log.Printf("Failed to set last filled index: %v", err)
+		}
+	}
+
 	err = group.Wait()
 	if err != nil {
 		log.Fatalf("error running backfill: %v", err)
@@ -264,4 +294,28 @@ func addToIndex(ctx context.Context, redisClient *redis.Client, key, value strin
 	}
 	_, err := redisClient.LPush(ctx, key, value).Result()
 	return err
+}
+
+func getLastFilledIndex(ctx context.Context, redisClient *redis.Client) (int, error) {
+	val, err := redisClient.Get(ctx, redisLastProcessedIndexKey).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return -1, nil // Indicate that no index has been filled yet
+		}
+		return 0, fmt.Errorf("failed to get last filled index from Redis: %w", err)
+	}
+	index, err := strconv.Atoi(val)
+	if err != nil {
+		return 0, fmt.Errorf("invalid last filled index value in Redis: %w", err)
+	}
+	return index, nil
+}
+
+func setLastFilledIndex(ctx context.Context, redisClient *redis.Client, index int) error {
+	indexStr := strconv.Itoa(index)
+	err := redisClient.Set(ctx, redisLastProcessedIndexKey, indexStr, 0).Err()
+	if err != nil {
+		return fmt.Errorf("failed to set last filled index in Redis: %w", err)
+	}
+	return nil
 }
