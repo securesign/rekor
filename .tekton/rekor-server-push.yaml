@@ -7,7 +7,7 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "main" &&
-      ( "Dockerfile.rekor-server.rh".pathChanged() || ".tekton/rekor-server-push.yaml".pathChanged() || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged() || "cmd/rekor-server".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged() )
+      ( "Dockerfile.rekor-server.rh".pathChanged() || ".tekton/rekor-server-push.yaml".pathChanged() || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged() || "cmd/rekor-server/***".pathChanged() || "pkg/***".pathChanged() || "Makefile".pathChanged() )
     build.appstudio.openshift.io/build-nudge-files: "controllers/constants/*"
   creationTimestamp: null
   labels:
