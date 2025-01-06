@@ -33,11 +33,9 @@ echo "starting services"
 ${docker_compose} up -d --build
 rm ~/.rekor/state.json || true
 
-echo "building CLI and server"
+echo "building CLI"
 go build -o rekor-cli ./cmd/rekor-cli
 REKOR_CLI=$(pwd)/rekor-cli
-go build -o rekor-server ./cmd/rekor-server
-
 
 function check_log_index () {
   logIndex=$1
@@ -99,7 +97,7 @@ function collectLogsOnFailure () {
     fi
     exit 0
 }
-trap "collectLogsOnFailure $?" EXIT
+trap "collectLogsOnFailure \$?" EXIT
 
 echo "Waiting for rekor server to come up..."
 waitForRekorServer
@@ -270,13 +268,13 @@ NUM_ELEMENTS=$(curl -f -H "Content-Type: application/json" --data '{"logIndexes"
 stringsMatch $NUM_ELEMENTS "2"
 
 # Make sure we get the expected LogIndex in the response when calling /retrieve endpoint
-RETRIEVE_LOGINDEX1=$(curl -f http://localhost:3000/api/v1/log/entries/retrieve -H "Content-Type: application/json" -H "Accept: application/json" -d "{ \"logIndexes\": [1]}" | jq '.[0]' | jq  -r .$UUID1.logIndex)
+RETRIEVE_LOGINDEX1=$(curl -f http://localhost:3000/api/v1/log/entries/retrieve -H "Content-Type: application/json" -H "Accept: application/json" -d "{ \"logIndexes\": [1]}" | jq '.[0]' | jq -r "with_entries(select(.key|test(\"^"$ENTRY_ID_1"$\"))) | .[].logIndex")
 stringsMatch $RETRIEVE_LOGINDEX1 "1"
 
 # Make sure that verification succeeds via UUID
 echo
 echo "Testing rekor-cli verification via UUID..."
-$REKOR_CLI verify --uuid $UUID1 --rekor_server http://localhost:3000
+$REKOR_CLI verify --uuid $ENTRY_ID_1 --rekor_server http://localhost:3000
 
 # Make sure that verification succeeds via Entry ID (Tree ID in hex + UUID)
 echo
