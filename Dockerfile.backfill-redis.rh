@@ -14,7 +14,7 @@ ARG SERVER_LDFLAGS
 RUN CGO_ENABLED=0 go build -mod=readonly -trimpath -ldflags "$(SERVER_LDFLAGS)" -o backfill-redis ./cmd/backfill-index
 
 # Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:94b434a29a894129301f6ff52dbddb19422fc800a109170c634b056da8cd704f
+FROM registry.redhat.io/rhel9/redis-6@sha256:d3f22dd78a7df204fb76ff7ce4ab6a5ed6fdb1a4fddb0930f77a3ef80956fcba
 COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
 WORKDIR /opt/app-root/src/home
 
