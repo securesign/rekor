@@ -10,7 +10,7 @@ release:
 # used when need to validate the goreleaser
 .PHONY: snapshot
 snapshot:
-	CLI_LDFLAGS="$(CLI_LDFLAGS)" SERVER_LDFLAGS="$(SERVER_LDFLAGS)" goreleaser release --skip-sign --skip-publish --snapshot --clean --timeout 120m
+	CLI_LDFLAGS="$(CLI_LDFLAGS)" SERVER_LDFLAGS="$(SERVER_LDFLAGS)" goreleaser release --skip=sign,publish --snapshot --clean --timeout 120m
 
 ###########################
 # sign section
@@ -33,12 +33,12 @@ copy-rekor-server-signed-release-to-ghcr:
 copy-rekor-cli-signed-release-to-ghcr:
 	cosign copy $(KO_PREFIX)/rekor-cli:$(GIT_VERSION) $(GHCR_PREFIX)/rekor-cli:$(GIT_VERSION)
 
-.PHONY: copy-backfill-redis-signed-release-to-ghcr
-copy-backfill-redis-signed-release-to-ghcr:
-	cosign copy $(KO_PREFIX)/backfill-redis:$(GIT_VERSION) $(GHCR_PREFIX)/backfill-redis:$(GIT_VERSION)
+.PHONY: copy-backfill-index-signed-release-to-ghcr
+copy-backfill-index-signed-release-to-ghcr:
+	cosign copy $(KO_PREFIX)/backfill-index:$(GIT_VERSION) $(GHCR_PREFIX)/backfill-index:$(GIT_VERSION)
 
 .PHONY: copy-signed-release-to-ghcr
-copy-signed-release-to-ghcr: copy-rekor-server-signed-release-to-ghcr copy-rekor-cli-signed-release-to-ghcr copy-backfill-redis-signed-release-to-ghcr
+copy-signed-release-to-ghcr: copy-rekor-server-signed-release-to-ghcr copy-rekor-cli-signed-release-to-ghcr copy-backfill-index-signed-release-to-ghcr
 
 ## --------------------------------------
 ## Dist / maybe we can deprecate
