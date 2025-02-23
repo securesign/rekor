@@ -28,7 +28,7 @@ require (
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0
 	github.com/sigstore/sigstore v1.8.10
 	github.com/spf13/cobra v1.8.1
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
 	github.com/theupdateframework/go-tuf v0.7.0
 	github.com/transparency-dev/merkle v0.0.2
