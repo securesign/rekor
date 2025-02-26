@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:356986205e66dcc03ef9a9fef5a7a13d6d59c29efacf1d971f9224c678932cf0 AS build-env
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:b848cf648a383b6e207ebd150afc7e65a90efe0d7734f4f6d2767144d58d68d0 AS build-env
 
 RUN mkdir /opt/app-root && mkdir /opt/app-root/src && mkdir /opt/app-root/src/cmd && mkdir /opt/app-root/src/pkg && git config --global --add safe.directory /opt/app-root/src
 
@@ -35,13 +35,13 @@ RUN CGO_ENABLED=0 go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o 
 RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test -mod=readonly ./cmd/rekor-server
 
 # debug compile options & debugger
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:356986205e66dcc03ef9a9fef5a7a13d6d59c29efacf1d971f9224c678932cf0 as debug
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:b848cf648a383b6e207ebd150afc7e65a90efe0d7734f4f6d2767144d58d68d0 as debug
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 
 # overwrite server and include debugger
 COPY --from=build-env /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
 
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:356986205e66dcc03ef9a9fef5a7a13d6d59c29efacf1d971f9224c678932cf0 as test
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:b848cf648a383b6e207ebd150afc7e65a90efe0d7734f4f6d2767144d58d68d0 as test
 
 USER root
 
