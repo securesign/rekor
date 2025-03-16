@@ -1,6 +1,8 @@
 module github.com/sigstore/rekor
 
-go 1.23.2
+go 1.23.4
+
+toolchain go1.23.7
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
@@ -18,7 +20,7 @@ require (
 	github.com/google/rpmpack v0.6.0
 	github.com/google/trillian v1.6.1
 	github.com/in-toto/in-toto-golang v0.9.0
-	github.com/jedisct1/go-minisign v0.0.0-20211028175153-1c139d1cc84b
+	github.com/jedisct1/go-minisign v0.0.0-20241212093149-d2f9f49435c7
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1 // indirect
