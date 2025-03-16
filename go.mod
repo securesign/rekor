@@ -43,7 +43,7 @@ require (
 	golang.org/x/sync v0.10.0
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/grpc v1.69.2
-	google.golang.org/protobuf v1.36.0
+	google.golang.org/protobuf v1.36.5
 	gopkg.in/ini.v1 v1.67.0
 	sigs.k8s.io/release-utils v0.8.5
 	sigs.k8s.io/yaml v1.4.0
@@ -72,7 +72,7 @@ require (
 	github.com/tink-crypto/tink-go-gcpkms/v2 v2.2.0
 	github.com/tink-crypto/tink-go/v2 v2.2.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4
 )
 
 require (
