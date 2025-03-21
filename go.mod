@@ -1,6 +1,6 @@
 module github.com/sigstore/rekor
 
-go 1.22.7
+go 1.23.0
 
 toolchain go1.23.4
 
@@ -74,7 +74,7 @@ require (
 	github.com/tink-crypto/tink-go-gcpkms/v2 v2.2.0
 	github.com/tink-crypto/tink-go/v2 v2.3.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250124145028-65684f501c47
 )
 
 require (
