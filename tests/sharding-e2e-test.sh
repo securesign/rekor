@@ -63,6 +63,18 @@ function stringsMatch () {
   fi
 }
 
+function stringsNotMatch () {
+  one=$1
+  two=$2
+
+  if [[ "$one" != "$two" ]]; then
+    echo "Strings do not match"
+  else
+    echo "Strings $one match but shouldn't"
+    exit 1
+  fi
+}
+
 function waitForRekorServer () {
   count=0
 
@@ -133,9 +145,6 @@ echo "the new shard ID is $SHARD_TREE_ID"
 # Once more
 $REKOR_CLI loginfo --rekor_server http://localhost:3000
 
-# Get the public key for the active tree for later
-ENCODED_PUBLIC_KEY=$(curl http://localhost:3000/api/v1/log/publicKey | base64 -w 0)
-
 # Spin down the rekor server
 echo "stopping the rekor server..."
 REKOR_CONTAINER_ID=$(docker ps --filter name=rekor-server --format {{.ID}})
@@ -143,10 +152,12 @@ docker stop $REKOR_CONTAINER_ID
 
 # Now we want to spin up the Rekor server again, but this time point
 # to the new tree
+# New shard will have a different signing key.
 SHARDING_CONFIG=sharding-config.yaml
 cat << EOF > $SHARDING_CONFIG
 - treeID: $INITIAL_TREE_ID
-  encodedPublicKey: $ENCODED_PUBLIC_KEY
+  signingConfig:
+    signingSchemeOrKeyPath: memory
 EOF
 
 cat $SHARDING_CONFIG
@@ -226,18 +237,16 @@ $REKOR_CLI logproof --last-size 2 --tree-id $INITIAL_TREE_ID --rekor_server http
 # And the logproof for the now active shard
 $REKOR_CLI logproof --last-size 1 --rekor_server http://localhost:3000
 
+# Make sure the shard keys are different
 echo "Getting public key for inactive shard..."
-GOT_PUB_KEY=$(curl "http://localhost:3000/api/v1/log/publicKey?treeID=$INITIAL_TREE_ID" | base64 -w 0)
-echo "Got encoded public key $GOT_PUB_KEY, making sure this matches the public key we got earlier..."
-stringsMatch $ENCODED_PUBLIC_KEY $GOT_PUB_KEY
-
+INACTIVE_PUB_KEY=$(curl "http://localhost:3000/api/v1/log/publicKey?treeID=$INITIAL_TREE_ID" | base64 -w 0)
 echo "Getting the public key for the active tree..."
 NEW_PUB_KEY=$(curl "http://localhost:3000/api/v1/log/publicKey" | base64 -w 0)
 echo "Making sure the public key for the active shard is different from the inactive shard..."
-if [[ "$ENCODED_PUBLIC_KEY" == "$NEW_PUB_KEY" ]]; then
+if [[ "$INACTIVE_PUB_KEY" == "$NEW_PUB_KEY" ]]; then
     echo
     echo "Active tree public key should be different from inactive shard public key but isn't..."
-    echo "Inactive Shard Public Key: $ENCODED_PUBLIC_KEY"
+    echo "Inactive Shard Public Key: $INACTIVE_PUB_KEY"
     echo "Active Shard Public Key: $NEW_PUB_KEY"
     exit 1
 fi
@@ -280,5 +289,15 @@ $REKOR_CLI verify --uuid $ENTRY_ID_1 --rekor_server http://localhost:3000
 echo
 echo "Testing rekor-cli verification via Entry ID..."
 DEBUG=1 $REKOR_CLI verify --uuid $ENTRY_ID_1 --rekor_server http://localhost:3000
+
+# Verify that the checkpoint/SignedTreeHead for inactive shards is cached between calls
+ACTIVE_SHARD_CHECKPOINT=$(curl "http://localhost:3000/api/v1/log" | jq .signedTreeHead | base64 -w 0)
+INACTIVE_SHARD_CHECKPOINT=$(curl "http://localhost:3000/api/v1/log" | jq .inactiveShards[0].signedTreeHead | base64 -w 0)
+ACTIVE_SHARD_CHECKPOINT_NOT_CACHED=$(curl "http://localhost:3000/api/v1/log" | jq .signedTreeHead | base64 -w 0)
+INACTIVE_SHARD_CHECKPOINT_CACHED=$(curl "http://localhost:3000/api/v1/log" | jq .inactiveShards[0].signedTreeHead | base64 -w 0)
+# inactive shard checkpoint is cached
+stringsMatch $INACTIVE_SHARD_CHECKPOINT $INACTIVE_SHARD_CHECKPOINT_CACHED
+# active shard checkpoint is not cached
+stringsNotMatch $ACTIVE_SHARD_CHECKPOINT $ACTIVE_SHARD_CHECKPOINT_NOT_CACHED
 
 echo "Test passed successfully :)"
