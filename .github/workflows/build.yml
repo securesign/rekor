@@ -53,12 +53,14 @@ jobs:
       - uses: ko-build/setup-ko@d982fec422852203cfb2053a8ec6ad302280d04d # v0.8
 
       - name: Set up Cloud SDK
+        if: false # securesign/rekor we dont have access to this gcp resource so this will always fail, this skips the step
         uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
         with:
           workload_identity_provider: 'projects/498091336538/locations/global/workloadIdentityPools/githubactions/providers/sigstore-rekor'
           service_account: 'github-actions-rekor@projectsigstore.iam.gserviceaccount.com'
 
       - name: creds
+        if: false # securesign/rekor we dont have access to this gcp resource so this will always fail, this skips the step
         run: gcloud auth configure-docker --quiet
 
       - name: container
