@@ -56,7 +56,7 @@ require (
 	cloud.google.com/go/pubsub v1.47.0
 	github.com/AdamKorcz/go-fuzz-headers-1 v0.0.0-20230919221257-8b5d3ce2d11d
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/cyberphone/json-canonicalization v0.0.0-20220623050100-57a0ce2678a7
+	github.com/cyberphone/json-canonicalization v0.0.0-20241213102144-19d51d7fe467
 	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang/mock v1.6.0
