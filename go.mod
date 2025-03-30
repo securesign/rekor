@@ -58,7 +58,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/cyberphone/json-canonicalization v0.0.0-20241213102144-19d51d7fe467
 	github.com/go-redis/redismock/v9 v9.2.0
-	github.com/go-sql-driver/mysql v1.8.1
+	github.com/go-sql-driver/mysql v1.9.1
 	github.com/golang/mock v1.6.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.7
