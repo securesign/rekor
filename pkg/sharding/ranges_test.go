@@ -41,7 +41,7 @@ import (
 
 	"github.com/google/trillian"
 	"google.golang.org/grpc"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func TestNewLogRanges(t *testing.T) {
