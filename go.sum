@@ -413,8 +413,8 @@ github.com/secure-systems-lab/go-securesystemslib v0.9.0 h1:rf1HIbL64nUpEIZnjLZ3
 github.com/secure-systems-lab/go-securesystemslib v0.9.0/go.mod h1:DVHKMcZ+V4/woA/peqr+L0joiRXbPpQ042GgJckkFgw=
 github.com/shibumi/go-pathspec v1.3.0 h1:QUyMZhFo0Md5B8zV8x2tesohbb5kfbpTi9rBnKh5dkI=
 github.com/shibumi/go-pathspec v1.3.0/go.mod h1:Xutfslp817l2I1cZvgcfeMQJG5QnU2lh5tVaaMCl3jE=
-github.com/sigstore/protobuf-specs v0.3.3 h1:RMZQgXTD/pF7KW6b5NaRLYxFYZ/wzx44PQFXN2PEo5g=
-github.com/sigstore/protobuf-specs v0.3.3/go.mod h1:vIhZ6Uor1a38+wvRrKcqL2PtYNlgoIW9lhzYzkyy4EU=
+github.com/sigstore/protobuf-specs v0.4.1 h1:5SsMqZbdkcO/DNHudaxuCUEjj6x29tS2Xby1BxGU7Zc=
+github.com/sigstore/protobuf-specs v0.4.1/go.mod h1:+gXR+38nIa2oEupqDdzg4qSBT0Os+sP7oYv6alWewWc=
 github.com/sigstore/sigstore v1.8.12 h1:S8xMVZbE2z9ZBuQUEG737pxdLjnbOIcFi5v9UFfkJFc=
 github.com/sigstore/sigstore v1.8.12/go.mod h1:+PYQAa8rfw0QdPpBcT+Gl3egKD9c+TUgAlF12H3Nmjo=
 github.com/sigstore/sigstore/pkg/signature/kms/aws v1.8.12 h1:EC3UmIaa7nV9sCgSpVevmvgvTYTkMqyrRbj5ojPp7tE=
@@ -649,8 +649,8 @@ google.golang.org/protobuf v1.22.0/go.mod h1:EGpADcykh3NcUnDUJcl1+ZksZNG86OlYog2
 google.golang.org/protobuf v1.23.0/go.mod h1:EGpADcykh3NcUnDUJcl1+ZksZNG86OlYog2l/sGQquU=
 google.golang.org/protobuf v1.23.1-0.20200526195155-81db48ad09cc/go.mod h1:EGpADcykh3NcUnDUJcl1+ZksZNG86OlYog2l/sGQquU=
 google.golang.org/protobuf v1.25.0/go.mod h1:9JNX74DMeImyA3h4bdi1ymwjUzf21/xIlbajtzgsN7c=
-google.golang.org/protobuf v1.36.5 h1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=
-google.golang.org/protobuf v1.36.5/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+google.golang.org/protobuf v1.36.6 h1:z1NpPI8ku2WgiWnf+t9wTPsn6eP1L7ksHUlkfLvd9xY=
+google.golang.org/protobuf v1.36.6/go.mod h1:jduwjTPXsFjZGTmRluh+L6NjiWu7pchiJ2/5YcXBHnY=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
