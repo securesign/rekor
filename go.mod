@@ -65,10 +65,10 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/sassoftware/relic/v7 v7.6.2
-	github.com/sigstore/protobuf-specs v0.3.3
+	github.com/sigstore/protobuf-specs v0.4.0
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.8.12
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.8.12
-	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.8.12
+	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.9.1
 	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.8.12
 	github.com/tink-crypto/tink-go-awskms/v2 v2.1.0
 	github.com/tink-crypto/tink-go-gcpkms/v2 v2.2.0
@@ -127,7 +127,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
@@ -164,15 +164,15 @@ require (
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250124145028-65684f501c47 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.4.0 // indirect
 )
 
 require (
-	cloud.google.com/go v0.118.1 // indirect
-	cloud.google.com/go/iam v1.3.1 // indirect
-	cloud.google.com/go/kms v1.20.5 // indirect
+	cloud.google.com/go v0.118.2 // indirect
+	cloud.google.com/go/iam v1.4.0 // indirect
+	cloud.google.com/go/kms v1.21.0 // indirect
 	cloud.google.com/go/storage v1.50.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
@@ -187,7 +187,7 @@ require (
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
-	github.com/google/go-containerregistry v0.20.2 // indirect
+	github.com/google/go-containerregistry v0.20.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
