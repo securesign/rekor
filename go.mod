@@ -35,7 +35,7 @@ require (
 	github.com/theupdateframework/go-tuf v0.7.0
 	github.com/transparency-dev/merkle v0.0.2
 	github.com/veraison/go-cose v1.3.0
-	github.com/zalando/go-keyring v0.2.3 // indirect
+	github.com/zalando/go-keyring v0.2.6 // indirect
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap v1.27.0
 	gocloud.dev v0.40.0
@@ -83,6 +83,7 @@ require (
 )
 
 require (
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.7 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cloud.google.com/go/longrunning v0.6.4 // indirect
@@ -97,7 +98,6 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.25.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.49.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.49.0 // indirect
-	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.32.8 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.3 // indirect
@@ -178,7 +178,7 @@ require (
 	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
-	github.com/danieljoos/wincred v1.2.0 // indirect
+	github.com/danieljoos/wincred v1.2.2 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
