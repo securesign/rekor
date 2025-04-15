@@ -74,8 +74,6 @@ require (
 	github.com/tink-crypto/tink-go-gcpkms/v2 v2.2.0
 	github.com/tink-crypto/tink-go/v2 v2.3.0
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4
-	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250404141209-ee84b53bf3d0
 )
 
