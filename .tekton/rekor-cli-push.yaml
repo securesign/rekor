@@ -6,8 +6,11 @@ metadata:
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "main" &&
-      ( "Dockerfile.rekor-cli.rh".pathChanged() || ".tekton/rekor-cli-push.yaml".pathChanged() || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged() || "cmd/rekor-cli".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged() || "Build.mak".pathChanged() )
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
+      == "main" && ( "Dockerfile.rekor-cli.rh".pathChanged() || ".tekton/rekor-cli-push.yaml".pathChanged()
+      || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged()
+      || "cmd/rekor-cli".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged()
+      || "Build.mak".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rekor
@@ -34,30 +37,31 @@ spec:
   - name: build-source-image
     value: "true"
   - name: go_unit_test
-    value: true
+    value: "true"
   - name: go_base_image
     value: brew.registry.redhat.io/rh-osbs/openshift-golang-builder:v1.23.4@sha256:5c6607f82aeb2cd3f71075d17555d4170b17927e8551967d2fd0e534b22b1c7b
-  taskRunSpecs:
-    - pipelineTaskName: prefetch-dependencies
-      stepSpecs:
-        - name: prefetch-dependencies
-          computeResources:
-            requests:
-              cpu: '3'
-              memory: 3Gi
-            limits:
-              cpu: '3'
-              memory: 3Gi
   pipelineRef:
-    resolver: git
     params:
-      - name: url
-        value: 'https://github.com/securesign/pipelines.git'
-      - name: revision
-        value: 'main'
-      - name: pathInRepo
-        value: 'pipelines/docker-build-oci-ta.yaml'
-  taskRunTemplate: {}
+    - name: url
+      value: https://github.com/securesign/pipelines.git
+    - name: revision
+      value: main
+    - name: pathInRepo
+      value: pipelines/docker-build-oci-ta.yaml
+    resolver: git
+  taskRunSpecs:
+  - pipelineTaskName: prefetch-dependencies
+    stepSpecs:
+    - computeResources:
+        limits:
+          cpu: "3"
+          memory: 3Gi
+        requests:
+          cpu: "3"
+          memory: 3Gi
+      name: prefetch-dependencies
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-rekor-cli
   workspaces:
   - name: git-auth
     secret:
