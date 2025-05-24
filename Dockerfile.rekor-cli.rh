@@ -1,5 +1,5 @@
 #Build stage#
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:v1.23.4@sha256:5c6607f82aeb2cd3f71075d17555d4170b17927e8551967d2fd0e534b22b1c7b AS build-env
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:v1.23.4@sha256:744be415305e1cf3701484b69e41bd67df2e0b728a5804fa170069cec6c9a189 AS build-env
 USER root
 
 RUN mkdir /opt/app-root && mkdir /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
@@ -29,7 +29,7 @@ RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
     git update-index --no-assume-unchanged Dockerfile.rekor-cli.rh
 
 #Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:4c8830d349732ed8066544e1cbcf878ad64f39aa4364f13cf4a69954b0ccbda5
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:92b1d5747a93608b6adb64dfd54515c3c5a360802db4706765ff3d8470df6290
 
 LABEL description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
 LABEL io.k8s.description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
