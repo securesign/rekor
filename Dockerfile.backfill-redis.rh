@@ -1,6 +1,6 @@
 # Build stage
 
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:v1.23.4@sha256:5c6607f82aeb2cd3f71075d17555d4170b17927e8551967d2fd0e534b22b1c7b AS build-env
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:v1.23.4@sha256:744be415305e1cf3701484b69e41bd67df2e0b728a5804fa170069cec6c9a189 AS build-env
 USER root
 RUN mkdir /opt/app-root && mkdir /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
 
@@ -14,7 +14,7 @@ ARG SERVER_LDFLAGS
 RUN CGO_ENABLED=0 go build -mod=readonly -trimpath -ldflags "$(SERVER_LDFLAGS)" -o backfill-redis ./cmd/backfill-index
 
 # Install stage
-FROM registry.redhat.io/rhel9/redis-6@sha256:b3bc93711cba7c05dabe6b4af0e0faff99ce8db308f9a0c4a82ad98822937611
+FROM registry.redhat.io/rhel9/redis-6@sha256:2cacd5d9dcd906bcad585c896689cf0580667145c084c3f5d51ae9a10aaa711b
 COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
 WORKDIR /opt/app-root/src/home
 
