@@ -18,12 +18,19 @@ package api
 import (
 	"bytes"
 	"context"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/elliptic"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cyberphone/json-canonicalization/go/src/webpki.org/jsoncanonicalizer"
@@ -43,11 +50,13 @@ import (
 	"github.com/sigstore/rekor/pkg/generated/models"
 	"github.com/sigstore/rekor/pkg/generated/restapi/operations/entries"
 	"github.com/sigstore/rekor/pkg/log"
+	"github.com/sigstore/rekor/pkg/pki/identity"
 	"github.com/sigstore/rekor/pkg/pubsub"
 	"github.com/sigstore/rekor/pkg/sharding"
 	"github.com/sigstore/rekor/pkg/tle"
 	"github.com/sigstore/rekor/pkg/trillianclient"
 	"github.com/sigstore/rekor/pkg/types"
+	hashedrekord "github.com/sigstore/rekor/pkg/types/hashedrekord/v0.0.1"
 	"github.com/sigstore/rekor/pkg/util"
 	"github.com/sigstore/sigstore/pkg/signature"
 	"github.com/sigstore/sigstore/pkg/signature/options"
@@ -179,7 +188,7 @@ func logEntryFromLeaf(ctx context.Context, leaf *trillian.LogLeaf, signedLogRoot
 		entryID: logEntryAnon}, nil
 }
 
-// GetLogEntryAndProofByIndexHandler returns the entry and inclusion proof for a specified log index
+// GetLogEntryByIndexHandler returns the entry and inclusion proof for a specified log index
 func GetLogEntryByIndexHandler(params entries.GetLogEntryByIndexParams) middleware.Responder {
 	ctx := params.HTTPRequest.Context()
 	logEntry, err := retrieveLogEntryByIndex(ctx, int(params.LogIndex))
@@ -192,12 +201,128 @@ func GetLogEntryByIndexHandler(params entries.GetLogEntryByIndexParams) middlewa
 	return entries.NewGetLogEntryByIndexOK().WithPayload(logEntry)
 }
 
+func getArtifactHashValue(entry types.EntryImpl) crypto.Hash {
+	artifactHash, err := entry.ArtifactHash()
+	if err != nil {
+		// Default to SHA256 if no artifact hash is specified
+		return crypto.SHA256
+	}
+
+	var artifactHashAlgorithm string
+	algoPosition := strings.Index(artifactHash, ":")
+	if algoPosition != -1 {
+		artifactHashAlgorithm = artifactHash[:algoPosition]
+	}
+	switch artifactHashAlgorithm {
+	case "sha256":
+		return crypto.SHA256
+	case "sha384":
+		return crypto.SHA384
+	case "sha512":
+		return crypto.SHA512
+	default:
+		return crypto.SHA256
+	}
+}
+
+func getPublicKey(identity identity.Identity) (crypto.PublicKey, error) {
+	switch identityCrypto := identity.Crypto.(type) {
+	case *x509.Certificate:
+		return identityCrypto.PublicKey, nil
+	case *rsa.PublicKey:
+		return identityCrypto, nil
+	case *ecdsa.PublicKey:
+		return identityCrypto, nil
+	case ed25519.PublicKey:
+		return identityCrypto, nil
+	default:
+		return nil, fmt.Errorf("unsupported public key type: %T", identityCrypto)
+	}
+}
+
+type checkedAlgorithmResult struct {
+	allowed   bool
+	publicKey crypto.PublicKey
+	hash      crypto.Hash
+}
+
+func checkEntryAlgorithms(entry types.EntryImpl) (checkedAlgorithmResult, error) {
+	// Only check algorithms for hashedrekord entries
+	switch entry.(type) {
+	case *hashedrekord.V001Entry:
+		break
+	default:
+		return checkedAlgorithmResult{allowed: true}, nil
+	}
+
+	verifiers, err := entry.Verifiers()
+	if err != nil {
+		return checkedAlgorithmResult{allowed: false}, err
+	}
+
+	artifactHashValue := getArtifactHashValue(entry)
+
+	// Check if all the verifiers public keys (together with the
+	// artifactHashValue) are allowed according to the policy
+	for _, v := range verifiers {
+		identities, err := v.Identities()
+		if err != nil {
+			return checkedAlgorithmResult{allowed: false}, err
+		}
+
+		for _, identity := range identities {
+			publicKey, err := getPublicKey(identity)
+			if err != nil {
+				return checkedAlgorithmResult{allowed: false}, err
+			}
+			isPermitted, err := api.algorithmRegistry.IsAlgorithmPermitted(publicKey, artifactHashValue)
+			if err != nil {
+				return checkedAlgorithmResult{allowed: false, publicKey: publicKey, hash: artifactHashValue}, fmt.Errorf("checking if algorithm is permitted: %w", err)
+			}
+			if !isPermitted {
+				return checkedAlgorithmResult{allowed: false, publicKey: publicKey, hash: artifactHashValue}, nil
+			}
+		}
+	}
+	return checkedAlgorithmResult{allowed: true}, nil
+}
+
 func createLogEntry(params entries.CreateLogEntryParams) (models.LogEntry, middleware.Responder) {
 	ctx := params.HTTPRequest.Context()
 	entry, err := types.CreateVersionedEntry(params.ProposedEntry)
 	if err != nil {
 		return nil, handleRekorAPIError(params, http.StatusBadRequest, err, fmt.Sprintf(validationError, err))
 	}
+
+	checkedAlgorithmResult, err := checkEntryAlgorithms(entry)
+	if err != nil {
+		return nil, handleRekorAPIError(params, http.StatusBadRequest, err, fmt.Sprintf(validationError, err))
+	}
+	if !checkedAlgorithmResult.allowed {
+		var publicKeyInfo string
+		switch pKey := checkedAlgorithmResult.publicKey.(type) {
+		case *ecdsa.PublicKey:
+			switch pKey.Curve {
+			case elliptic.P256():
+				publicKeyInfo = "ecdsa public key: P256"
+			case elliptic.P384():
+				publicKeyInfo = "ecdsa public key: P384"
+			case elliptic.P521():
+				publicKeyInfo = "ecdsa public key: P521"
+			default:
+				publicKeyInfo = "ecdsa public key"
+			}
+		case *rsa.PublicKey:
+			publicKeyInfo = fmt.Sprintf("rsa public key: %T/%v", pKey, pKey.Size())
+		case *ed25519.PublicKey:
+			publicKeyInfo = fmt.Sprintf("ed25519 public key: %T", pKey)
+		default:
+			publicKeyInfo = fmt.Sprintf("public key: %T", pKey)
+		}
+		algorithmInfo := fmt.Sprintf("entry algorithm %v/%v not allowed", publicKeyInfo, checkedAlgorithmResult.hash)
+		return nil, handleRekorAPIError(params, http.StatusBadRequest, errors.New(algorithmInfo), fmt.Sprintf(validationError, "entry algorithms are not allowed"))
+	}
+
 	leaf, err := types.CanonicalizeEntry(ctx, entry)
 	if err != nil {
 		var validationErr *types.InputValidationError

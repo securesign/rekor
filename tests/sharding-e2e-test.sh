@@ -79,7 +79,7 @@ function waitForRekorServer () {
   count=0
 
   echo -n "waiting up to 60 sec for system to start"
-  until [ $(${docker_compose} ps | grep -c "(healthy)") == 3 ];
+  until [ $(${docker_compose} ps | grep -c "(healthy)") == 5 ];
   do
       if [ $count -eq 6 ]; then
         echo "! timeout reached"
@@ -164,7 +164,6 @@ cat $SHARDING_CONFIG
 
 COMPOSE_FILE=docker-compose-sharding.yaml
 cat << EOF > $COMPOSE_FILE
-version: '3.4'
 services:
   rekor-server:
     build:
