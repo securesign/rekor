@@ -39,7 +39,7 @@ spec:
   - name: go_unit_test
     value: "true"
   - name: go_base_image
-    value: brew.registry.redhat.io/rh-osbs/openshift-golang-builder:v1.23.4@sha256:5c6607f82aeb2cd3f71075d17555d4170b17927e8551967d2fd0e534b22b1c7b
+    value: brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.23@sha256:44fd8f88f3b6463cda15571260f9ca3a0b78d3c8c8827a338e04ab3a23581a88
   pipelineRef:
     params:
     - name: url
