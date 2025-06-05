@@ -36,7 +36,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"os/exec"
 
 	"github.com/sigstore/rekor/pkg/sharding"
 
