@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.23.5@sha256:e213430692e5c31aba27473cdc84cfff2896d0c097e984bef67b6a44c75a8181 AS builder
+FROM golang:1.24.3@sha256:81bf5927dc91aefb42e2bc3a5abdbe9bb3bae8ba8b107e2a4cf43ce3402534c6 AS builder
 ENV APP_ROOT=/opt/app-root
 ENV GOPATH=$APP_ROOT
 
@@ -31,7 +31,7 @@ RUN CGO_ENABLED=0 go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o 
 RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test ./cmd/rekor-server
 
 # Multi-Stage production build
-FROM golang:1.23.5@sha256:e213430692e5c31aba27473cdc84cfff2896d0c097e984bef67b6a44c75a8181 as deploy
+FROM golang:1.24.3@sha256:81bf5927dc91aefb42e2bc3a5abdbe9bb3bae8ba8b107e2a4cf43ce3402534c6 AS deploy
 
 # Retrieve the binary from the previous stage
 COPY --from=builder /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
@@ -40,12 +40,12 @@ COPY --from=builder /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
 CMD ["rekor-server", "serve"]
 
 # debug compile options & debugger
-FROM deploy as debug
+FROM deploy AS debug
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.22.1
 
 # overwrite server and include debugger
 COPY --from=builder /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
 
-FROM deploy as test
+FROM deploy AS test
 # overwrite server with test build with code coverage
 COPY --from=builder /opt/app-root/src/rekor-server_test /usr/local/bin/rekor-server

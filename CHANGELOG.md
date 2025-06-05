@@ -1,3 +1,44 @@
+# v1.3.10
+
+Note that Rekor v1 is in maintenance mode as we are actively developing
+its successor, Rekor v2, designed to be easy to maintain and cheaper to operate.. See the
+[README](https://github.com/sigstore/rekor?tab=readme-ov-file#current-state-of-rekor-v1)
+for more information.
+
+## Features
+
+* Added --client-signing-algorithms flag (#1974)
+
+## Fixes / Misc
+
+* emit unpopulated values when marshalling (#2438)
+* pkg/api: better logs when algorithm registry rejects a key (#2429)
+* chore: improve mysql readiness checks (#2397)
+
+## Contributors
+
+* Bob Callaway
+* cangqiaoyuzhuo
+* Carlos Tadeu Panato Junior
+* cpanato
+* Hayden B
+* Praful Khanduri
+* Ramon Petgrave
+* Riccardo Schirone
+* rubyisrust
+* Sascha Grunert
+
+# v1.3.9
+
+## Features
+
+* Cache checkpoint for inactive shards (#2332)
+* Support per-shard signing keys (#2330)
+
+## Contributors
+
+* Hayden B
+
 # v1.3.8
 
 ## Bug Fixes

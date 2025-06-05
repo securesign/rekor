@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	tinkUtils "github.com/sigstore/rekor/pkg/signer/tink"
+	tinkUtils "github.com/sigstore/sigstore/pkg/signature/tink"
 	"github.com/tink-crypto/tink-go-awskms/v2/integration/awskms"
 	"github.com/tink-crypto/tink-go-gcpkms/v2/integration/gcpkms"
 	"github.com/tink-crypto/tink-go/v2/core/registry"
@@ -34,7 +34,7 @@ import (
 
 const TinkScheme = "tink"
 
-// NewTinkSignerWithHandle returns a signature.SignerVerifier that wraps crypto.Signer and a hash function.
+// NewTinkSigner returns a signature.SignerVerifier that wraps crypto.Signer and a hash function.
 // Provide a path to the encrypted keyset and cloud KMS key URI for decryption
 func NewTinkSigner(ctx context.Context, kekURI, keysetPath string) (signature.Signer, error) {
 	if kekURI == "" || keysetPath == "" {
@@ -60,11 +60,11 @@ func NewTinkSignerWithHandle(kek tink.AEAD, keysetPath string) (signature.Signer
 	if err != nil {
 		return nil, err
 	}
-	signer, hash, err := tinkUtils.KeyHandleToSigner(kh)
+	signer, err := tinkUtils.KeyHandleToSigner(kh)
 	if err != nil {
 		return nil, err
 	}
-	return signature.LoadSignerVerifier(signer, hash)
+	return signature.LoadDefaultSignerVerifier(signer)
 }
 
 // getKeyEncryptionKey returns a Tink AEAD encryption key from KMS
