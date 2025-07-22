@@ -13,17 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.23@sha256:96cfceb50f5323efa1aa8569d4420cdbf1bb391225d5171ef72a0d0ecf028467 AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:1.24@sha256:6fd64cd7f38a9b87440f963b6c04953d04de65c35b9672dbd7f1805b0ae20d09 AS build-env
 
-RUN mkdir /opt/app-root && mkdir /opt/app-root/src && mkdir /opt/app-root/src/cmd && mkdir /opt/app-root/src/pkg && git config --global --add safe.directory /opt/app-root/src
+RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && mkdir -p /opt/app-root/src/cmd && mkdir -p /opt/app-root/src/pkg && git config --global --add safe.directory /opt/app-root/src
 
 ENV APP_ROOT=/opt/app-root
 ENV GOPATH=$APP_ROOT
-
+ENV GOEXPERIMENT=strictfipsruntime
+ENV CGO_ENABLED=1
 
 WORKDIR $APP_ROOT/src/
 ADD go.mod go.sum $APP_ROOT/src/
-RUN CGO_ENABLED=0 go mod download
+RUN go mod download
 
 # Add source code
 ADD ./cmd/ $APP_ROOT/src/cmd/
@@ -31,7 +32,7 @@ ADD ./pkg/ $APP_ROOT/src/pkg/
 
 ARG SERVER_LDFLAGS
 RUN go build -ldflags "${SERVER_LDFLAGS}" -mod=readonly ./cmd/rekor-server
-RUN CGO_ENABLED=0 go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o rekor-server_debug -mod=readonly ./cmd/rekor-server
+RUN go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o rekor-server_debug -mod=readonly ./cmd/rekor-server
 RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test -mod=readonly ./cmd/rekor-server
 
 # debug compile options & debugger
