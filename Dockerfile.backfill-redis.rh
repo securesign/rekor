@@ -18,7 +18,7 @@ ARG SERVER_LDFLAGS
 RUN go build -mod=readonly -trimpath -ldflags "$(SERVER_LDFLAGS)" -o backfill-redis ./cmd/backfill-index
 
 # Install stage
-FROM registry.redhat.io/rhel9/redis-6@sha256:fd37c53401903c8c579d5cf335b04a3b4c2f7db4351cc6ed8fd9f2451781a9bb
+FROM registry.redhat.io/rhel9/redis-6@sha256:650199af918ec07956d27638491db7c57ff89be032e02dab768f0b3048aed0a0
 COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
 WORKDIR /opt/app-root/src/home
 
