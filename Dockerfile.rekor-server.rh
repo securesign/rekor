@@ -61,7 +61,7 @@ RUN mkdir -p /var/run/attestations && \
 COPY --from=build-env /opt/app-root/src/rekor-server_test /usr/local/bin/rekor-server
 
 # Multi-Stage production build
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:a8a0ca73331bb7dc87d6d70bc6c4547ec281eb823ae8819d76973f1d4f69a2ee as deploy
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:e9baeac712bed315a442543efed921c666cef0d70da6a9788fbfc9a3ea17224c as deploy
 
 LABEL description="Rekor aims to provide an immutable, tamper-resistant ledger of metadata generated within a software project’s supply chain."
 LABEL io.k8s.description="Rekor-Server provides a tamper resistant ledger."
