@@ -27,6 +27,8 @@ on:
 jobs:
   build:
     name: build
+    # RHTAS - Skipping due to auth with google
+    if: github.repository == 'sigstore/rekor'
     runs-on: ubuntu-latest
 
     permissions:
