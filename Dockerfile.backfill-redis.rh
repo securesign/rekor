@@ -28,7 +28,8 @@ LABEL io.k8s.display-name="Backfillredis container image for Red Hat Trusted Sig
 LABEL io.openshift.tags="backfill-redis trusted-signer"
 LABEL summary="Provides the backfill-redis binary for a rekor server"
 LABEL com.redhat.component="backfill-redis"
-LABEL name="backfill-redis"
+LABEL name="rhtas/rekor-backfill-redis-rhel9"
+LABEL cpe="cpe:/a:redhat:trusted_artifact_signer:1.2::el9"
 
 #ENTRYPOINT
 ENTRYPOINT [ "backfill-redis" ]
