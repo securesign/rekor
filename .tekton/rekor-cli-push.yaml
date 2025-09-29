@@ -52,12 +52,14 @@ spec:
     stepSpecs:
     - computeResources:
         limits:
-          cpu: "3"
-          memory: 3Gi
-        requests:
-          cpu: "3"
           memory: 3Gi
       name: prefetch-dependencies
+  - pipelineTaskName: run-unit-test
+    stepSpecs:
+    - computeResources:
+        limits:
+          memory: 3Gi
+      name: run-tests
   taskRunTemplate:
     serviceAccountName: build-pipeline-rekor-cli
   workspaces:
