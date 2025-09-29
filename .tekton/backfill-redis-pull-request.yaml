@@ -61,6 +61,16 @@ spec:
           cpu: "3"
           memory: 3Gi
       name: prefetch-dependencies
+  - pipelineTaskName: run-unit-test
+    stepSpecs:
+    - computeResources:
+        limits:
+          cpu: "3"
+          memory: 3Gi
+        requests:
+          cpu: "3"
+          memory: 3Gi
+      name: run-unit-test
   taskRunTemplate:
     serviceAccountName: build-pipeline-backfill-redis
   workspaces:
