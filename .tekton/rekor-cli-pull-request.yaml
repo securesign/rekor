@@ -70,7 +70,7 @@ spec:
         requests:
           cpu: "3"
           memory: 3Gi
-      name: run-unit-test
+      name: run-tests
   taskRunTemplate:
     serviceAccountName: build-pipeline-rekor-cli
   workspaces:
