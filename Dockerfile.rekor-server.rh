@@ -73,6 +73,7 @@ LABEL name="rhtas/rekor-server-rhel9"
 
 # Retrieve the binary from the previous stage
 COPY --from=build-env /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
+COPY LICENSE /licenses/license.txt
 
 USER 65532:65532
 

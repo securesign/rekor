@@ -20,6 +20,7 @@ RUN go build -mod=readonly -trimpath -ldflags "$(SERVER_LDFLAGS)" -o backfill-re
 # Install stage
 FROM registry.redhat.io/rhel9/redis-6@sha256:0962d18bb5292c0e524354f319b63287c2298a4a2fd34556c68fa285df381427
 COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
+COPY LICENSE /licenses/license.txt
 WORKDIR /opt/app-root/src/home
 
 LABEL description="Backfillredis is a job that will go through the TLog and make sure that missing entries are added to the search index."
