@@ -59,7 +59,7 @@ spec:
     stepSpecs:
     - computeResources:
         limits:
-          memory: 3Gi
+          memory: 5Gi
       name: run-tests
   taskRunTemplate:
     serviceAccountName: build-pipeline-backfill-redis

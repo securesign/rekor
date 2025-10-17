@@ -48,6 +48,7 @@ COPY --from=build-env /opt/app-root/src/rekor_cli_linux_arm64.gz /usr/local/bin/
 COPY --from=build-env /opt/app-root/src/rekor_cli_linux_ppc64le.gz /usr/local/bin/rekor_cli_linux_ppc64le.gz
 COPY --from=build-env /opt/app-root/src/rekor_cli_linux_s390x.gz /usr/local/bin/rekor_cli_linux_s390x.gz
 COPY --from=build-env /opt/app-root/src/rekor_cli_windows_amd64.exe.gz /usr/local/bin/rekor_cli_windows_amd64.exe.gz
+COPY LICENSE /licenses/license.txt
 WORKDIR /opt/app-root/src/home
 
-
+USER 65532:65532
