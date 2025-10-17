@@ -30,5 +30,7 @@ LABEL summary="Provides the backfill-redis binary for a rekor server"
 LABEL com.redhat.component="backfill-redis"
 LABEL name="rhtas/rekor-backfill-redis-rhel9"
 
+USER 65532:65532
+
 #ENTRYPOINT
 ENTRYPOINT [ "backfill-redis" ]
