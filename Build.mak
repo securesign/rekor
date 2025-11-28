@@ -1,4 +1,3 @@
-
 # Set version variables for LDFLAGS
 GIT_VERSION ?= $(shell git describe --tags --always --dirty)
 GIT_HASH ?= $(shell git rev-parse HEAD)
@@ -26,34 +25,19 @@ REKOR_LDFLAGS=-X sigs.k8s.io/release-utils/version.gitVersion=$(GIT_VERSION) \
 
 CLI_LDFLAGS=$(REKOR_LDFLAGS)
 SERVER_LDFLAGS=$(REKOR_LDFLAGS)
+FIPS_MODULE ?= latest
 
 .PHONY: 
-cross-platform: rekor-cli-darwin-arm64 rekor-cli-darwin-amd64 rekor-cli-linux-amd64 rekor-cli-linux-arm64 rekor-cli-linux-ppc64le rekor-cli-linux-s390x rekor-cli-windows ## Build all distributable (cross-platform) binaries
+cross-platform: rekor-cli-darwin-arm64 rekor-cli-darwin-amd64 rekor-cli-windows ## Build all distributable (cross-platform) binaries
 
 .PHONY:	rekor-cli-darwin-arm64
 rekor-cli-darwin-arm64: $(SRCS)## Build for mac M1
-	env CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -v -o rekor_cli_darwin_arm64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=darwin GOARCH=arm64 go build -v -o rekor_cli_darwin_arm64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
 
 .PHONY: rekor-cli-darwin-amd64
 rekor-cli-darwin-amd64:  $(SRCS)## Build for Darwin (macOS)
-	env CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o rekor_cli_darwin_amd64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
-
-.PHONY: rekor-cli-linux-amd64 
-rekor-cli-linux-amd64: $(SRCS)## Build for Linux amd64
-	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o rekor_cli_linux_amd64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
-
-.PHONY: rekor-cli-linux-arm64
-rekor-cli-linux-arm64: $(SRCS) ## Build for Linux arm64
-	env CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o rekor_cli_linux_arm64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
-
-.PHONY: rekor-cli-linux-ppc64le
-rekor-cli-linux-ppc64le: $(SRCS)## Build for Linux ppc64le
-	env CGO_ENABLED=0 GOOS=linux GOARCH=ppc64le go build -o rekor_cli_linux_ppc64le -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
-
-.PHONY: rekor-cli-linux-s390x
-rekor-cli-linux-s390x: $(SRCS) ## Build for Linux s390x
-	env CGO_ENABLED=0 GOOS=linux GOARCH=s390x go build -o rekor_cli_linux_s390x -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=darwin GOARCH=amd64 go build -o rekor_cli_darwin_amd64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
 
 .PHONY: rekor-cli-windows
 rekor-cli-windows: $(SRCS) ## Build for Windows
-	env CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o rekor_cli_windows_amd64.exe -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=windows GOARCH=amd64 go build -o rekor_cli_windows_amd64.exe -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
