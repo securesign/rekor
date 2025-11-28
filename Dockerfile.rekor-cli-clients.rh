@@ -1,0 +1,61 @@
+# Build stage
+FROM registry.redhat.io/ubi9/go-toolset:9.7@sha256:71f121a44270e46a17a548d6b92096a1a0fb56db44927ad318d095177d6dce4b AS build-env
+
+ENV APP_ROOT=/opt/app-root \
+    GOPATH=/opt/app-root \
+    CGO_ENABLED=1 \
+    GOEXPERIMENT=strictfipsruntime \
+    GOFLAGS="-buildvcs=false"
+
+USER root
+
+RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
+
+WORKDIR /opt/app-root/src
+
+COPY . .
+
+WORKDIR /opt/app-root/src/hack/tools
+RUN go mod vendor
+
+WORKDIR /opt/app-root/src
+RUN set -euo pipefail; \
+    git update-index --assume-unchanged Dockerfile.rekor-cli.rh; \
+    GIT_VERSION="$(git describe --tags --always --dirty)"; \
+    GIT_HASH="$(git rev-parse HEAD)"; \
+    GIT_TREESTATE=clean \
+    BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"; \
+    REKOR_LDFLAGS="-X sigs.k8s.io/release-utils/version.gitVersion=${GIT_VERSION} \
+                   -X sigs.k8s.io/release-utils/version.gitCommit=${GIT_HASH} \
+                   -X sigs.k8s.io/release-utils/version.gitTreeState=${GIT_TREESTATE} \
+                   -X sigs.k8s.io/release-utils/version.buildDate=${BUILD_DATE}"; \
+    CLI_LDFLAGS="${REKOR_LDFLAGS} -w -s"; \
+    make Makefile.swagger; \
+    mkdir -p /releases; \
+    # Build for Linux amd64
+    CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-linux-amd64 ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-linux-amd64.tar.gz rekor-cli-linux-amd64; \
+    # Build for Linux arm64
+    CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-linux-arm64 ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-linux-arm64.tar.gz rekor-cli-linux-arm64; \
+    # Build for Linux ppc64le
+    CGO_ENABLED=1 GOOS=linux GOARCH=ppc64le go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-linux-ppc64le ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-linux-ppc64le.tar.gz rekor-cli-linux-ppc64le; \
+    # Build for Linux s390x
+    CGO_ENABLED=1 GOOS=linux GOARCH=s390x go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-linux-s390x ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-linux-s390x.tar.gz rekor-cli-linux-s390x; \
+    # Build for Darwin amd64
+    CGO_ENABLED=0 GOFIPS140=latest GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-darwin-amd64 ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-darwin-amd64.tar.gz rekor-cli-darwin-amd64; \
+    # Build for Darwin arm64
+    CGO_ENABLED=0 GOFIPS140=latest GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-darwin-arm64 ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-darwin-arm64.tar.gz rekor-cli-darwin-arm64; \
+    # Build for Windows amd64
+    CGO_ENABLED=0 GOFIPS140=latest GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "${CLI_LDFLAGS}" -o rekor-cli-windows-amd64.exe ./cmd/rekor-cli; \
+    tar -czf /releases/rekor-cli-windows-amd64.tar.gz rekor-cli-windows-amd64.exe;
+
+# Final stage
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:61d5ad475048c2e655cd46d0a55dfeaec182cc3faa6348cb85989a7c9e196483
+COPY --from=build-env /releases /releases
+LABEL name="rekor-cli-clients"
+
