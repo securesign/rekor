@@ -24,10 +24,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/middleware"
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sigstore/rekor/pkg/api"
 	"github.com/sigstore/rekor/pkg/log"
+	cose "github.com/sigstore/rekor/pkg/types/cose/v0.0.1"
+	intoto001 "github.com/sigstore/rekor/pkg/types/intoto/v0.0.1"
+	intoto002 "github.com/sigstore/rekor/pkg/types/intoto/v0.0.2"
 	"github.com/sigstore/sigstore/pkg/signature"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -90,8 +92,8 @@ func init() {
 	rootCmd.PersistentFlags().Uint16("trillian_log_server.port", 8090, "Trillian log server port")
 	rootCmd.PersistentFlags().Uint("trillian_log_server.tlog_id", 0, "Trillian tree id")
 	rootCmd.PersistentFlags().String("trillian_log_server.sharding_config", "", "path to config file for inactive shards, in JSON or YAML")
+	rootCmd.PersistentFlags().String("trillian_log_server.grpc_default_service_config", "", "JSON string used to configure gRPC clients for communicating with Trillian")
 
-	rootCmd.PersistentFlags().Bool("enable_stable_checkpoint", true, "publish stable checkpoints to Redis. When disabled, gossiping may not be possible if the log checkpoint updates too frequently")
 	rootCmd.PersistentFlags().Uint("publish_frequency", 5, "how often to publish a new checkpoint, in minutes")
 
 	hostname, err := os.Hostname()
@@ -104,6 +106,8 @@ func init() {
 	rootCmd.PersistentFlags().String("rekor_server.signer", "memory",
 		`Rekor signer to use. Valid options are: [awskms://keyname, azurekms://keyname, gcpkms://keyname, hashivault://keyname, memory, tink, <filename containing PEM-encoded private key>].
 Memory and file-based signers should only be used for testing.`)
+	rootCmd.PersistentFlags().Uint("rekor_server.signer.gcpkms.retries", 0, "Number of retries for GCP KMS requests")
+	rootCmd.PersistentFlags().Uint("rekor_server.signer.gcpkms.timeout", 0, "sets the RPC timeout per call for GCP KMS requests in seconds, defaults to 0 (no timeout)")
 	rootCmd.PersistentFlags().String("rekor_server.signer-passwd", "", "Password to decrypt signer private key")
 	rootCmd.PersistentFlags().String("rekor_server.tink_kek_uri", "", "Key encryption key for decrypting Tink keyset. Valid options are [aws-kms://keyname, gcp-kms://keyname]")
 	rootCmd.PersistentFlags().String("rekor_server.tink_keyset_path", "", "Path to encrypted Tink keyset, containing private key to sign log checkpoints")
@@ -195,7 +199,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
-		home, err := homedir.Dir()
+		home, err := os.UserHomeDir()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -213,4 +217,9 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Logger.Infof("Using config file: %s", viper.ConfigFileUsed())
 	}
+
+	maxSize := viper.GetInt("max_attestation_size")
+	intoto001.SetMaxAttestationSize(maxSize)
+	intoto002.SetMaxAttestationSize(maxSize)
+	cose.SetMaxAttestationSize(maxSize)
 }
