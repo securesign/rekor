@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/profiler"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-openapi/loads"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -126,7 +126,7 @@ var serveCmd = &cobra.Command{
 		server.Port = int(viper.GetUint("port"))
 		server.EnabledListeners = []string{"http"}
 
-		treeID := viper.GetUint("trillian_log_server.tlog_id")
+		treeID := viper.GetInt64("trillian_log_server.tlog_id")
 
 		api.ConfigureAPI(treeID)
 		server.ConfigureAPI()

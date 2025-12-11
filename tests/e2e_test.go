@@ -53,7 +53,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/cyberphone/json-canonicalization/go/src/webpki.org/jsoncanonicalizer"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/sigstore/rekor/pkg/api"
@@ -62,9 +62,10 @@ import (
 	"github.com/sigstore/rekor/pkg/generated/client/entries"
 	"github.com/sigstore/rekor/pkg/generated/client/pubkey"
 	"github.com/sigstore/rekor/pkg/generated/models"
-	sigx509 "github.com/sigstore/rekor/pkg/pki/x509"
+	e2ex509 "github.com/sigstore/rekor/pkg/pki/x509/e2ex509"
 	"github.com/sigstore/rekor/pkg/sharding"
 	"github.com/sigstore/rekor/pkg/signer"
+	"github.com/sigstore/rekor/pkg/trillianclient"
 	_ "github.com/sigstore/rekor/pkg/types/intoto/v0.0.1"
 	rekord "github.com/sigstore/rekor/pkg/types/rekord/v0.0.1"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
@@ -75,13 +76,13 @@ import (
 )
 
 var (
-	testTreeID     uint = 12345
-	testSignerKey       = "testdata/signer.key"
-	testSignerCert      = "testdata/signer.pem"
-	testSignerPass      = "testpassword"
-	testCAPath          = "testdata/ca.pem"
-	testCAKeyPath       = "testdata/ca.key"
-	testServerAddr      = "localhost:8090"
+	testTreeID     int64 = 12345
+	testSignerKey        = "testdata/signer.key"
+	testSignerCert       = "testdata/signer.pem"
+	testSignerPass       = "testpassword"
+	testCAPath           = "testdata/ca.pem"
+	testCAKeyPath        = "testdata/ca.key"
+	testServerAddr       = "localhost:8090"
 )
 
 func getUUIDFromUploadOutput(t *testing.T, out string) string {
@@ -261,7 +262,7 @@ func TestSignedEntryTimestamp(t *testing.T) {
 			},
 			Signature: &models.RekordV001SchemaSignature{
 				Content: (*strfmt.Base64)(&sig),
-				Format:  swag.String(models.RekordV001SchemaSignatureFormatX509),
+				Format:  conv.Pointer(models.RekordV001SchemaSignatureFormatX509),
 				PublicKey: &models.RekordV001SchemaSignaturePublicKey{
 					Content: (*strfmt.Base64)(&pemBytes),
 				},
@@ -270,7 +271,7 @@ func TestSignedEntryTimestamp(t *testing.T) {
 	}
 
 	returnVal := models.Rekord{
-		APIVersion: swag.String(re.APIVersion()),
+		APIVersion: conv.Pointer(re.APIVersion()),
 		Spec:       re.RekordObj,
 	}
 	params := entries.NewCreateLogEntryParams()
@@ -397,8 +398,7 @@ func TestDialE2E(t *testing.T) {
 			viper.Set("trillian_log_server.tls_ca_cert", tt.tlsCACert)
 			viper.Set("trillian_log_server.tls", tt.useSystemTLS)
 
-			serverAddr := listener.Addr().String()
-			conn, _ := api.TestDial(serverAddr)
+			conn, _ := trillianclient.TestDial("localhost", uint16(listener.Addr().(*net.TCPAddr).Port), tt.tlsCACert, tt.useSystemTLS)
 			require.NotNil(t, conn)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -530,7 +530,7 @@ func TestEntryUpload(t *testing.T) {
 			},
 			Signature: &models.RekordV001SchemaSignature{
 				Content: (*strfmt.Base64)(&sig),
-				Format:  swag.String(models.RekordV001SchemaSignatureFormatPgp),
+				Format:  conv.Pointer(models.RekordV001SchemaSignatureFormatPgp),
 				PublicKey: &models.RekordV001SchemaSignaturePublicKey{
 					Content: (*strfmt.Base64)(&pubKeyBytes),
 				},
@@ -539,7 +539,7 @@ func TestEntryUpload(t *testing.T) {
 	}
 
 	returnVal := models.Rekord{
-		APIVersion: swag.String(re.APIVersion()),
+		APIVersion: conv.Pointer(re.APIVersion()),
 		Spec:       re.RekordObj,
 	}
 	entryBytes, err := json.Marshal(returnVal)
@@ -615,14 +615,14 @@ func TestInclusionProofRace(t *testing.T) {
 	artifactPath := filepath.Join(t.TempDir(), "artifact")
 	sigPath := filepath.Join(t.TempDir(), "signature.asc")
 
-	sigx509.CreatedX509SignedArtifact(t, artifactPath, sigPath)
+	e2ex509.CreatedX509SignedArtifact(t, artifactPath, sigPath)
 	dataBytes, _ := ioutil.ReadFile(artifactPath)
 	h := sha256.Sum256(dataBytes)
 	dataSHA := hex.EncodeToString(h[:])
 
 	// Write the public key to a file
 	pubPath := filepath.Join(t.TempDir(), "pubKey.asc")
-	if err := ioutil.WriteFile(pubPath, []byte(sigx509.RSACert), 0644); err != nil {
+	if err := ioutil.WriteFile(pubPath, []byte(e2ex509.RSACert), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -635,7 +635,7 @@ func TestInclusionProofRace(t *testing.T) {
 		artifactPath := filepath.Join(t.TempDir(), "artifact")
 		sigPath := filepath.Join(t.TempDir(), "signature.asc")
 
-		sigx509.CreatedX509SignedArtifact(t, artifactPath, sigPath)
+		e2ex509.CreatedX509SignedArtifact(t, artifactPath, sigPath)
 		dataBytes, _ := ioutil.ReadFile(artifactPath)
 		h := sha256.Sum256(dataBytes)
 		dataSHA := hex.EncodeToString(h[:])
@@ -710,7 +710,7 @@ func getTreeID(t *testing.T) int64 {
 	tidStr := strings.TrimSpace(strings.Split(out, "TreeID: ")[1])
 	tid, err := strconv.ParseInt(tidStr, 10, 64)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Error(err)
 	}
 	t.Log("Tree ID:", tid)
 	return tid
@@ -721,7 +721,7 @@ func getTotalTreeSize(t *testing.T) int64 {
 	sizeStr := strings.Fields(strings.Split(out, "Total Tree Size: ")[1])[0]
 	size, err := strconv.ParseInt(sizeStr, 10, 64)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Error(err)
 	}
 	t.Log("Total Tree Size:", size)
 	return size
@@ -808,7 +808,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 			},
 			Signature: &models.RekordV001SchemaSignature{
 				Content: (*strfmt.Base64)(&firstSigBytes),
-				Format:  swag.String(models.RekordV001SchemaSignatureFormatPgp),
+				Format:  conv.Pointer(models.RekordV001SchemaSignatureFormatPgp),
 				PublicKey: &models.RekordV001SchemaSignaturePublicKey{
 					Content: (*strfmt.Base64)(&pubKeyBytes),
 				},
@@ -816,7 +816,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 		},
 	}
 	firstEntry := &models.Rekord{
-		APIVersion: swag.String(firstRekord.APIVersion()),
+		APIVersion: conv.Pointer(firstRekord.APIVersion()),
 		Spec:       firstRekord.RekordObj,
 	}
 
@@ -833,7 +833,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 			},
 			Signature: &models.RekordV001SchemaSignature{
 				Content: (*strfmt.Base64)(&secondSigBytes),
-				Format:  swag.String(models.RekordV001SchemaSignatureFormatPgp),
+				Format:  conv.Pointer(models.RekordV001SchemaSignatureFormatPgp),
 				PublicKey: &models.RekordV001SchemaSignaturePublicKey{
 					Content: (*strfmt.Base64)(&pubKeyBytes),
 				},
@@ -841,7 +841,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 		},
 	}
 	secondEntry := &models.Rekord{
-		APIVersion: swag.String(secondRekord.APIVersion()),
+		APIVersion: conv.Pointer(secondRekord.APIVersion()),
 		Spec:       secondRekord.RekordObj,
 	}
 
@@ -860,7 +860,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 	invalidEntryID := "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeeefff"
 	invalidIndex := int64(-1)
 	invalidEntry := &models.Rekord{
-		APIVersion: swag.String(secondRekord.APIVersion()),
+		APIVersion: conv.Pointer(secondRekord.APIVersion()),
 	}
 
 	nonexistentArtifactPath := filepath.Join(t.TempDir(), "artifact3")
@@ -879,7 +879,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 			},
 			Signature: &models.RekordV001SchemaSignature{
 				Content: (*strfmt.Base64)(&nonexistentSigBytes),
-				Format:  swag.String(models.RekordV001SchemaSignatureFormatPgp),
+				Format:  conv.Pointer(models.RekordV001SchemaSignatureFormatPgp),
 				PublicKey: &models.RekordV001SchemaSignaturePublicKey{
 					Content: (*strfmt.Base64)(&pubKeyBytes),
 				},
@@ -887,7 +887,7 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 		},
 	}
 	nonexistentEntry := &models.Rekord{
-		APIVersion: swag.String("0.0.1"),
+		APIVersion: conv.Pointer("0.0.1"),
 		Spec:       nonexistentRekord.RekordObj,
 	}
 
@@ -1248,5 +1248,25 @@ func TestSearchLogQuerySingleShard(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestGetLogProofInvalidShard(t *testing.T) {
+	// Test case for GetLogProofHandler where a valid int64 is given for logIndex,
+	// but it doesn't match a known shard. This should result in a 400 Bad Request, not a 500 error.
+	treeID := "999999999999999999" // A large int64 value
+	firstSize := "1"
+	lastSize := "2"
+
+	url := fmt.Sprintf("%s/api/v1/log/proof?treeID=%s&firstSize=%s&lastSize=%s", rekorServer(), treeID, firstSize, lastSize)
+	resp, err := http.Get(url)
+	if err != nil {
+		t.Fatalf("unexpected error getting log proof: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusBadRequest {
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		t.Fatalf("expected status code %d, got %d: %s", http.StatusBadRequest, resp.StatusCode, string(bodyBytes))
 	}
 }
