@@ -1,6 +1,8 @@
 module github.com/sigstore/rekor/hack/tools
 
-go 1.25.4
+go 1.24.0
+
+toolchain go1.24.5
 
 require (
 	github.com/AdamKorcz/go-fuzz-headers-1 v0.0.0-20230329111138-12e09aba5ebd
@@ -53,12 +55,12 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/toqueteos/webbrowser v1.2.1 // indirect
 	go.mongodb.org/mongo-driver v1.17.4 // indirect
-	golang.org/x/crypto v0.45.0 // indirect
-	golang.org/x/mod v0.29.0 // indirect
-	golang.org/x/sync v0.18.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
-	golang.org/x/tools v0.38.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/mod v0.26.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/tools v0.35.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
