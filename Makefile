@@ -174,10 +174,10 @@ $(GO-FUZZ-BUILD): $(TOOLS_DIR)/go.mod ## Build go-fuzz-build tool
 	cd $(TOOLS_DIR); go build -trimpath -tags=tools -o $(TOOLS_BIN_DIR)/go-fuzz-build github.com/dvyukov/go-fuzz/go-fuzz-build
 
 $(SWAGGER): $(TOOLS_DIR)/go.mod ## Build swagger tool
-	cd $(TOOLS_DIR); go build -trimpath -tags=tools -o $(TOOLS_BIN_DIR)/swagger github.com/go-swagger/go-swagger/cmd/swagger
+	cd $(TOOLS_DIR); GOTOOLCHAIN=local go build -trimpath -tags=tools -o $(TOOLS_BIN_DIR)/swagger github.com/go-swagger/go-swagger/cmd/swagger
 
 $(GOCOVMERGE): $(TOOLS_DIR)/go.mod ## Build gocovmerge tool
-	cd $(TOOLS_DIR); go build -trimpath -tags=tools -o $(TOOLS_BIN_DIR)/gocovmerge github.com/wadey/gocovmerge
+	cd $(TOOLS_DIR); GOTOOLCHAIN=local go build -trimpath -tags=tools -o $(TOOLS_BIN_DIR)/gocovmerge github.com/wadey/gocovmerge
 
 ##################
 # help

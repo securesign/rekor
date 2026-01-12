@@ -15,6 +15,10 @@
 # limitations under the License.
 set -e
 
+# Force Go to use the locally installed toolchain version
+# This prevents issues when checking out older tags with different go.mod versions
+export GOTOOLCHAIN=local
+
 TREE_ID=""
 
 docker_compose="docker compose"
