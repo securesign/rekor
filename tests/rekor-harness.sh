@@ -15,10 +15,6 @@
 # limitations under the License.
 set -e
 
-# Force Go to automatically use the correct toolchain version
-# This prevents issues when checking out older tags with different go.mod versions
-export GOTOOLCHAIN=auto
-
 TREE_ID=""
 
 docker_compose="docker compose"
