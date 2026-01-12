@@ -1,3 +1,100 @@
+# v1.4.3
+
+This release reduces dependencies for a number of exported packages.
+
+This release also changes the format of the binary and container signature, which is now a
+[Sigstore bundle](https://docs.sigstore.dev/about/bundle/). To verify a release, use the
+latest Cosign 3.x, verifying with
+`cosign verify-blob --bundle <artifact>-keyless.sigstore.json <artifact>`.
+
+## Improvements
+
+* use interruptable context to elegantly handle signals in rekor-cli (#2681)
+* restapi: Don't log client errors as errors (#2680)
+* pkg: separate pki types from implementations (#2668)
+* e2e: don't mix e2e and regular utilities (#2672)
+* pkg: remove viper config from spec definitions (#2669)
+* log: remove zap & go-chi dependecy from pkg/types (#2667)
+* chore: update go-openapi/runtime to v0.29.0 (#2670)
+* chore: remove double imported mapstructure pkg (#2671)
+* remove archived dependency and use stdlib slices (#2650)
+
+## Documentation
+
+* (docs): guard unsafe int/uint conversions flagged by gosec (#2679)
+
+## Contributors
+
+* AdamKorcz
+* Bob Callaway
+* Jussi Kukkonen
+* Sachin Sampras M
+* Tõnis Tiigi
+
+# v1.4.2
+
+This release includes some performance optimizations and a bug fix for publishing events to a pub/sub topic.
+
+## Fixes
+
+* use pubsub client to check IAM permissions (#2605)
+* process type contents serially (#2604)
+* move to direct decoding instead of mapstructure (#2598)
+* optimize performance of regex operations (#2603)
+
+## Contributors
+
+* Bob Callaway
+
+# v1.4.1
+
+This release includes updated dependencies for known CVEs, as well as some optimizations to minimize gRPC traffic between Rekor and Trillian.
+
+## Fixes
+
+* use less expensive gRPC call to implement GetLeafAndProofByHash (#2581)
+* move to per-shard trillian client manager (#2564)
+* use cheaper gRPC endpoint when we already have the inclusion proof (#2580)
+* simplify hash and signature verification in rekord type (#2579)
+* use correct type; just look for len() instead of nil check (#2576)
+* return correct error if GetLeafAndProofByHash fails (#2574)
+* fix incorrect client lb policy in test config (#2551)
+* numerous upgraded dependencies
+
+## Contributors
+* Bob Callaway
+* Carlos Alexandro Becker
+
+# v1.4.0
+
+This is a minor version release given the removal of the stable checkpoint feature. To our knowledge, this was not
+used effectively anywhere and therefore was removed from Rekor v1. Witnessing will be added as part of the upcoming
+Rekor v2 release.
+
+## Features
+
+* enable retries and timeouts on GCP KMS calls (#2548)
+* allow configuring gRPC default service config for trillian client load balancing & timeouts (#2549)
+* move context handling in trillian RPC calls to be request based and idiomatic (#2536)
+
+## Fixes
+
+* Fix docker compose up --wait failing when Trillian server isn't healthy (#2473)
+* better mysql healthcheck (#2459)
+* numerous upgraded dependencies, including moving to go 1.24
+
+## Removed
+
+* remove stable checkpoint feature (#2537)
+* Don't initialize index storage with stable checkpoint publishing (#2486)
+
+## Contributors
+* Bob Callaway
+* Carlos Tadeu Panato Junior
+* Emmanuel Ferdman
+* Hayden B
+* Ramon Petgrave
+
 # v1.3.10
 
 Note that Rekor v1 is in maintenance mode as we are actively developing
