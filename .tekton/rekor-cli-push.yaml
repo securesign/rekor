@@ -7,16 +7,16 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "main" && ( "Dockerfile.rekor-cli.rh".pathChanged() || ".tekton/rekor-cli-push.yaml".pathChanged()
+      == "release-1.2" && ( "Dockerfile.rekor-cli.rh".pathChanged() || ".tekton/rekor-cli-push.yaml".pathChanged()
       || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged()
       || "cmd/rekor-cli".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged()
       || "Build.mak".pathChanged() )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: rekor
-    appstudio.openshift.io/component: rekor-cli
+    appstudio.openshift.io/application: tas-tools-v1-2
+    appstudio.openshift.io/component: rekor-cli-v1-2
     pipelines.appstudio.openshift.io/type: build
-  name: rekor-cli-on-push
+  name: rekor-cli-v1-2-on-push
   namespace: rhtas-tenant
 spec:
   params:
@@ -59,7 +59,7 @@ spec:
           memory: 3Gi
       name: prefetch-dependencies
   taskRunTemplate:
-    serviceAccountName: build-pipeline-rekor-cli
+    serviceAccountName: build-pipeline-rekor-cli-v1-2
   workspaces:
   - name: git-auth
     secret:
