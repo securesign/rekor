@@ -14,7 +14,7 @@ metadata:
       || "Build.mak".pathChanged() )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: rekor
+    appstudio.openshift.io/application: tas-tools
     appstudio.openshift.io/component: rekor-cli
     pipelines.appstudio.openshift.io/type: build
   name: rekor-cli-on-pull-request
