@@ -8,16 +8,16 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
-      == "main" && ( "Dockerfile.backfill-redis.rh".pathChanged() || ".tekton/backfill-redis-pull-request.yaml".pathChanged()
+      == "release-1.2" && ( "Dockerfile.backfill-redis.rh".pathChanged() || ".tekton/backfill-redis-pull-request.yaml".pathChanged()
       || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged()
       || "cmd/backfill-redis".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged()
       )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: rekor
-    appstudio.openshift.io/component: backfill-redis
+    appstudio.openshift.io/application: tas-components-v1-2
+    appstudio.openshift.io/component: backfill-redis-v1-2
     pipelines.appstudio.openshift.io/type: build
-  name: backfill-redis-on-pull-request
+  name: backfill-redis-v1-2-on-pull-request
   namespace: rhtas-tenant
 spec:
   params:
@@ -62,7 +62,7 @@ spec:
           memory: 3Gi
       name: prefetch-dependencies
   taskRunTemplate:
-    serviceAccountName: build-pipeline-backfill-redis
+    serviceAccountName: build-pipeline-backfill-redis-v1-2
   workspaces:
   - name: git-auth
     secret:
