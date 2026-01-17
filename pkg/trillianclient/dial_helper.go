@@ -1,4 +1,5 @@
-// Copyright 2023 The Sigstore Authors.
+//
+// Copyright 2025 The Sigstore Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package mockclient provides a mockable version of the Trillian log client API.
-package mockclient
+//go:build e2e
 
-//go:generate mockgen -package mockclient -destination mock_log_client.go github.com/google/trillian TrillianLogClient
+package trillianclient
+
+import "google.golang.org/grpc"
+
+// TestDial  exposes the dial function for testing purposes
+func TestDial(hostname string, port uint16, tlsCACertFile string, useSystemTrustStore bool) (*grpc.ClientConn, error) {
+	return dial(hostname, port, tlsCACertFile, useSystemTrustStore, "")
+}
