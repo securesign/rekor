@@ -7,7 +7,7 @@ toolchain go1.24.5
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/cavaliercoder/go-rpm v0.0.0-20200122174316-8cb9fd9c31a8
+	github.com/cavaliercoder/go-rpm v1.3.0
 	github.com/go-openapi/errors v0.22.4
 	github.com/go-openapi/loads v0.23.2
 	github.com/go-openapi/runtime v0.29.2
