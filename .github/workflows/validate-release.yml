@@ -91,6 +91,7 @@ jobs:
         env:
           PROJECT_ID: honk-fake-project
           RUNTIME_IMAGE: gcr.io/distroless/static:debug-nonroot
+          GORELEASER_CONFIG: .goreleaser.ci.yml
 
       - name: check binaries
         run: |
