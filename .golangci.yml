@@ -42,9 +42,21 @@ linters:
       - linters:
           - gosec
         text: 'G115: '
+      - linters:
+          - staticcheck
+        text: 'SA1019: swag\.'
+      - linters:
+          - staticcheck
+        text: 'SA1019: "cloud.google.com/go/pubsub"'
+      - linters:
+          - revive
+        path: _test\.go
+        text: 'var-naming'
+      - linters:
+          - revive
+        text: 'avoid meaningless package names'
     paths:
       - third_party$
-      - builtin$
       - examples$
 issues:
   max-issues-per-linter: 0
@@ -57,5 +69,4 @@ formatters:
     generated: lax
     paths:
       - third_party$
-      - builtin$
       - examples$
