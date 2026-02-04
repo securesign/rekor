@@ -118,7 +118,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: E2E Docker Compose logs
+          name: e2e-docker-compose-logs
           path: /tmp/docker-compose.log
       - name: Upload Coverage Report
         uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
@@ -168,7 +168,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: E2E Docker Compose logs
+          name: backfill-docker-compose-logs
           path: /tmp/docker-compose.log
 
   sharding-e2e:
@@ -199,7 +199,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: Sharding E2E Docker Compose logs
+          name: sharding-e2e-docker-compose-logs
           path: /tmp/docker-compose.log
 
   issue-872-e2e:
@@ -224,7 +224,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: Docker Compose logs
+          name: issue-872-e2e-docker-compose-logs
           path: /tmp/*docker-compose.log
 
   client-algorithms-e2e:
@@ -249,7 +249,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: Docker Compose logs
+          name: client-algorithms-e2e-docker-compose-logs
           path: /tmp/*docker-compose.log
 
   harness:
@@ -278,5 +278,5 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: E2E Docker Compose logs
+          name: harness-docker-compose-logs
           path: /tmp/docker-compose.log
