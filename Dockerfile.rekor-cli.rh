@@ -39,7 +39,7 @@ LABEL io.k8s.display-name="Rekor-cli container image for Red Hat Trusted Signer"
 LABEL io.openshift.tags="rekor-cli trusted-signer"
 LABEL summary="Provides the rekor CLI binary for interacting with a rekor server"
 LABEL com.redhat.component="rekor-cli"
-LABEL name="rekor-cli"
+LABEL name="rhtas/rekor-cli-rhel9"
 
 COPY --from=build-env /opt/app-root/src/rekor_cli_darwin_amd64.gz /usr/local/bin/rekor_cli_darwin_amd64.gz
 COPY --from=build-env /opt/app-root/src/rekor_cli_linux_amd64.gz /usr/local/bin/rekor_cli_linux_amd64.gz
