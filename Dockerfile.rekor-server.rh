@@ -36,13 +36,13 @@ RUN go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o rekor-server_d
 RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test -mod=readonly ./cmd/rekor-server
 
 # debug compile options & debugger
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:2e38fae8c9caa7a0e23c54f6d612bd3a4a4fc170514be7eb24f44ea1ff7861c9 as debug
+FROM registry.redhat.io/ubi9/go-toolset:9.7@sha256:6da1160c0e8da15b585560ac6ef7b0179f17686aeaaa477ead6427daf8948fea as debug
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 
 # overwrite server and include debugger
 COPY --from=build-env /opt/app-root/src/rekor-server_debug /usr/local/bin/rekor-server
 
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder@sha256:2e38fae8c9caa7a0e23c54f6d612bd3a4a4fc170514be7eb24f44ea1ff7861c9 as test
+FROM registry.redhat.io/ubi9/go-toolset:9.7@sha256:6da1160c0e8da15b585560ac6ef7b0179f17686aeaaa477ead6427daf8948fea as test
 
 USER root
 
