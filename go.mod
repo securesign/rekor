@@ -5,7 +5,7 @@ go 1.25.7
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/cavaliercoder/go-rpm v1.3.0
+	github.com/cavaliergopher/rpm v1.3.0
 	github.com/go-openapi/errors v0.22.7
 	github.com/go-openapi/loads v0.23.3
 	github.com/go-openapi/runtime v0.29.3
@@ -190,7 +190,6 @@ require (
 	cloud.google.com/go/kms v1.26.0 // indirect
 	cloud.google.com/go/storage v1.57.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/danieljoos/wincred v1.2.3 // indirect
