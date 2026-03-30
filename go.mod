@@ -16,7 +16,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/rpmpack v0.7.1
 	github.com/google/trillian v1.7.2
-	github.com/in-toto/in-toto-golang v0.10.0
+	github.com/in-toto/in-toto-golang v0.9.0
 	github.com/jedisct1/go-minisign v0.0.0-20241212093149-d2f9f49435c7
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/sassoftware/relic v7.2.1+incompatible
 	github.com/secure-systems-lab/go-securesystemslib v0.10.0
-	github.com/sigstore/sigstore v1.10.4
+	github.com/sigstore/sigstore v1.10.5
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
@@ -67,14 +67,14 @@ require (
 	github.com/redis/go-redis/v9 v9.14.1
 	github.com/sassoftware/relic/v7 v7.6.2
 	github.com/sigstore/protobuf-specs v0.5.0
-	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.4
-	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.4
-	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.10.4
-	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.10.4
+	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.5
+	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.5
+	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.10.5
+	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.10.5
 	github.com/stretchr/testify v1.11.1
 	github.com/tink-crypto/tink-go-awskms/v2 v2.1.0
 	github.com/tink-crypto/tink-go-gcpkms/v2 v2.2.0
-	github.com/tink-crypto/tink-go/v2 v2.5.0
+	github.com/tink-crypto/tink-go/v2 v2.6.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260319201613-d00831a3d3e7
 )
 
@@ -148,13 +148,12 @@ require (
 	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.7 // indirect
 	github.com/hashicorp/vault/api v1.23.0 // indirect
-	github.com/in-toto/attestation v1.1.2 // indirect
 	github.com/jellydator/ttlcache/v3 v3.4.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.1-0.20220621161143-b0104c826a24 // indirect
 	github.com/klauspost/compress v1.18.5 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.37 // indirect
+	github.com/mattn/go-sqlite3 v1.14.38 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
