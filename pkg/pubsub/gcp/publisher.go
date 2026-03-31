@@ -27,7 +27,7 @@ import (
 	"github.com/sigstore/rekor/pkg/events"
 	sigpubsub "github.com/sigstore/rekor/pkg/pubsub"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
 	"google.golang.org/api/option"
 )
 
