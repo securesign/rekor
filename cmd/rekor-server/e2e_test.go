@@ -228,7 +228,7 @@ func TestSearchNoEntriesRC1(t *testing.T) {
 }
 func TestHostnameInSTH(t *testing.T) {
 	// get ID of container
-	c := exec.Command("docker","ps","-q","-f","name=rekor-server")
+	c := exec.Command("docker", "ps", "-q", "-f", "name=rekor-server")
 	b, err := c.CombinedOutput()
 	if err != nil {
 		t.Fatal(err)
