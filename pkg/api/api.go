@@ -260,6 +260,7 @@ func ConfigureAPI(treeID uint) {
 
 		// create context to cancel goroutine on server shutdown
 		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		api.checkpointPublishCancel = cancel
 		checkpointPublisher.StartPublisher(ctx)
 	}
