@@ -28,7 +28,7 @@ jobs:
   check-signature:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sigstore/cosign/cosign:v2.5.0-dev@sha256:d6786d0b31f9577ed6cc1f7fb5080f2335f0cbff2cfceffef5043ee83ebc3a6e
+      image: ghcr.io/sigstore/cosign/cosign:v3.0.4-dev@sha256:782e916a04d4b879fdadb94366f9b58fdf13b6b2e24635a9c9b6cbf57799df02
 
     steps:
       - name: Check Signature
