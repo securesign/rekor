@@ -51,7 +51,6 @@ func NewGetLogInfoParams() GetLogInfoParams {
 //
 // swagger:parameters getLogInfo
 type GetLogInfoParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -70,7 +69,6 @@ func (o *GetLogInfoParams) BindRequest(r *http.Request, route *middleware.Matche
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qStable, qhkStable, _ := qs.GetOK("stable")
