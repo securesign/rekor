@@ -218,7 +218,7 @@ func getTreeID(t *testing.T) int64 {
 	tidStr := strings.TrimSpace(strings.Split(out, "TreeID: ")[1])
 	tid, err := strconv.ParseInt(tidStr, 10, 64)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Error(err)
 	}
 	t.Log("Tree ID:", tid)
 	return tid
@@ -228,7 +228,7 @@ func TestSearchNoEntriesRC1(t *testing.T) {
 }
 func TestHostnameInSTH(t *testing.T) {
 	// get ID of container
-	c := exec.Command("docker","ps","-q","-f","name=rekor-server")
+	c := exec.Command("docker", "ps", "-q", "-f", "name=rekor-server")
 	b, err := c.CombinedOutput()
 	if err != nil {
 		t.Fatal(err)
