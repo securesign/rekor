@@ -140,5 +140,5 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:3000/ping"]
       interval: 10s
       timeout: 3s
-      retries: 15
-      start_period: 30s
+      retries: 3
+      start_period: 5s
