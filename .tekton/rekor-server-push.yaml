@@ -7,15 +7,14 @@ metadata:
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "main" && ( "Dockerfile.rekor-server.rh".pathChanged() || ".tekton/rekor-server-push.yaml".pathChanged()
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "release-1.4" && ( "Dockerfile.rekor-server.rh".pathChanged() || ".tekton/rekor-server-push.yaml".pathChanged()
       || "trigger-konflux-builds.txt".pathChanged() || "go.mod".pathChanged() || "go.sum".pathChanged()
       || "cmd/rekor-server".pathChanged() || "pkg".pathChanged() || "Makefile".pathChanged()
       )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: tas-components
-    appstudio.openshift.io/component: rekor-server
+    appstudio.openshift.io/application: tas-components-v1-4
+    appstudio.openshift.io/component: rekor-server-v1-4
     pipelines.appstudio.openshift.io/type: build
   name: rekor-server-on-push
   namespace: rhtas-tenant
@@ -66,7 +65,7 @@ spec:
           memory: 5Gi
       name: run-tests
   taskRunTemplate:
-    serviceAccountName: build-pipeline-rekor-server
+    serviceAccountName: build-pipeline-rekor-server-v1-4
   workspaces:
   - name: git-auth
     secret:
