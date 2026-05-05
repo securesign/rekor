@@ -1,4 +1,4 @@
-//go:build !fips
+//go:build fips
 
 // RHTAS FIPS - DO NOT REMOVE
 
@@ -19,7 +19,26 @@
 
 package main
 
-import "github.com/sigstore/rekor/cmd/rekor-server/app"
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/sigstore/rekor/cmd/rekor-server/app"
+)
+
+func init() {
+	data, err := os.ReadFile("/proc/sys/crypto/fips_enabled")
+	if err != nil {
+		fmt.Println("FIPS binary: could not read /proc/sys/crypto/fips_enabled")
+		return
+	}
+	if strings.TrimSpace(string(data)) == "1" {
+		fmt.Println("Rekor server is running in FIPS mode")
+	} else {
+		fmt.Println("WARNING: FIPS binary running on non-FIPS enabled system")
+	}
+}
 
 func main() {
 	app.Execute()

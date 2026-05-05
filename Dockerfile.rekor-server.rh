@@ -32,6 +32,7 @@ ADD ./pkg/ $APP_ROOT/src/pkg/
 
 ARG SERVER_LDFLAGS
 RUN go build -ldflags "${SERVER_LDFLAGS}" -mod=readonly ./cmd/rekor-server
+RUN go build -tags=fips -ldflags "${SERVER_LDFLAGS}" -o rekor-server-fips -mod=readonly ./cmd/rekor-server
 RUN go build -gcflags "all=-N -l" -ldflags "${SERVER_LDFLAGS}" -o rekor-server_debug -mod=readonly ./cmd/rekor-server
 RUN go test -c -ldflags "${SERVER_LDFLAGS}" -cover -covermode=count -coverpkg=./... -o rekor-server_test -mod=readonly ./cmd/rekor-server
 
@@ -73,6 +74,7 @@ LABEL name="rhtas/rekor-server-rhel9"
 
 # Retrieve the binary from the previous stage
 COPY --from=build-env /opt/app-root/src/rekor-server /usr/local/bin/rekor-server
+COPY --from=build-env /opt/app-root/src/rekor-server-fips /usr/local/bin/rekor-server-fips
 COPY LICENSE /licenses/license.txt
 
 USER 65532:65532
