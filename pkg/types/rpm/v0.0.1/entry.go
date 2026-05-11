@@ -31,7 +31,7 @@ import (
 	"strconv"
 	"strings"
 
-	rpmutils "github.com/cavaliercoder/go-rpm"
+	rpmutils "github.com/cavaliergopher/rpm"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag/conv"
 
