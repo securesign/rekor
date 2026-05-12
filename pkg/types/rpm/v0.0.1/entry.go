@@ -31,7 +31,7 @@ import (
 	"strconv"
 	"strings"
 
-	rpmutils "github.com/cavaliercoder/go-rpm"
+	rpmutils "github.com/cavaliergopher/rpm"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag/conv"
 
@@ -174,7 +174,7 @@ func DecodeEntry(input any, output *models.RpmV001Schema) error {
 	}
 }
 
-func (v *V001Entry) fetchExternalEntities(_ context.Context) (*pgp.PublicKey, *rpmutils.PackageFile, error) {
+func (v *V001Entry) fetchExternalEntities(_ context.Context) (*pgp.PublicKey, *rpmutils.Package, error) {
 	if err := v.validate(); err != nil {
 		return nil, nil, &types.InputValidationError{Err: err}
 	}
@@ -219,7 +219,7 @@ func (v *V001Entry) fetchExternalEntities(_ context.Context) (*pgp.PublicKey, *r
 	}
 
 	// Parse RPM package
-	rpmObj, err := rpmutils.ReadPackageFile(rpmBuffer)
+	rpmObj, err := rpmutils.Read(rpmBuffer)
 	if err != nil {
 		return nil, nil, &types.InputValidationError{Err: err}
 	}
@@ -265,14 +265,20 @@ func (v *V001Entry) Canonicalize(ctx context.Context) ([]byte, error) {
 	canonicalEntry.Package.Headers["Version"] = rpmObj.Version()
 	canonicalEntry.Package.Headers["Release"] = rpmObj.Release()
 	canonicalEntry.Package.Headers["Architecture"] = rpmObj.Architecture()
-	if md5sum := rpmObj.GetBytes(0, 1004); md5sum != nil {
-		canonicalEntry.Package.Headers["RPMSIGTAG_MD5"] = hex.EncodeToString(md5sum)
+	if tag := rpmObj.Signature.GetTag(1004); tag != nil {
+		if md5sum := tag.Bytes(); md5sum != nil {
+			canonicalEntry.Package.Headers["RPMSIGTAG_MD5"] = hex.EncodeToString(md5sum)
+		}
 	}
-	if sha1sum := rpmObj.GetBytes(0, 1012); sha1sum != nil {
-		canonicalEntry.Package.Headers["RPMSIGTAG_SHA1"] = hex.EncodeToString(sha1sum)
+	if tag := rpmObj.Signature.GetTag(1012); tag != nil {
+		if sha1sum := tag.Bytes(); sha1sum != nil {
+			canonicalEntry.Package.Headers["RPMSIGTAG_SHA1"] = hex.EncodeToString(sha1sum)
+		}
 	}
-	if sha256sum := rpmObj.GetBytes(0, 1016); sha256sum != nil {
-		canonicalEntry.Package.Headers["RPMSIGTAG_SHA256"] = hex.EncodeToString(sha256sum)
+	if tag := rpmObj.Signature.GetTag(1016); tag != nil {
+		if sha256sum := tag.Bytes(); sha256sum != nil {
+			canonicalEntry.Package.Headers["RPMSIGTAG_SHA256"] = hex.EncodeToString(sha256sum)
+		}
 	}
 
 	// wrap in valid object with kind and apiVersion set
