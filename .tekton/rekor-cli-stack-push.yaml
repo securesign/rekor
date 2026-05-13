@@ -12,7 +12,7 @@ metadata:
     appstudio.openshift.io/application: cli-stacks-v1-4
     appstudio.openshift.io/component: rekor-cli-stack-v1-4
     pipelines.appstudio.openshift.io/type: build
-  name: rekor-cli-stack-on-push
+  name: rekor-cli-stack-v1-4-on-push
   namespace: rhtas-tenant
 spec:
   params:

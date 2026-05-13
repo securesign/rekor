@@ -16,7 +16,7 @@ metadata:
     appstudio.openshift.io/application: tas-tools-v1-4
     appstudio.openshift.io/component: rekor-cli-v1-4
     pipelines.appstudio.openshift.io/type: build
-  name: rekor-cli-on-push
+  name: rekor-cli-v1-4-on-push
   namespace: rhtas-tenant
 spec:
   params:
