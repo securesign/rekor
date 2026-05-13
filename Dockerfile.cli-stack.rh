@@ -1,7 +1,7 @@
-FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:93d222fa55f27b9b50fbb6a9e26f9945d8f07e6148b59c5b5c391fb2cc306c75 AS build-amd64
-FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:8bad272115b6aca11a0c56cea1e59d7bad2eb2fb19d504b58bc8a864c3ccf9b5 AS build-arm64
-FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:5b4cfc9a75b6280f71623e2dbc554b14c01b23cc34d636f8ef79a9e41e3a8e03 AS build-ppc64le
-FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:794e55323b2ad900b2e9cd4045a79c18581ceac40406e09ec6c94ed7441d43e2 AS build-s390x
+FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:8fee435821a371210ba10e008f1327f65a10309514cd300c2eb8c94ff4decbc4 AS build-amd64
+FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:9af9d0e306ea885b44586a2295d86d0c12559541634ae97dd49273090ea60d08 AS build-arm64
+FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:35d7d0c6641d850bc8dcb0faa504268c00b27bd44b8ea3203245a5d96a27d3b6 AS build-ppc64le
+FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:c140e6e1efef8eb2c1b7a071f459bb19c5dfcd048ba4e8da669bff17b0ba710a AS build-s390x
 
 FROM registry.redhat.io/ubi9/go-toolset:9.7-1778604137@sha256:e06a6f4c85c3ca75f64127542449c9770fb885adfb592f987c576d268ac108de AS packager
 USER root
