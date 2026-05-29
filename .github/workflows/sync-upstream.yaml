@@ -23,7 +23,7 @@ jobs:
           private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - uses: securesign/actions/sync-upstream@main
+      - uses: securesign/actions/sync-upstream@tturek/auto-resolve-conflicts
         with:
           token: ${{ steps.app-token.outputs.token }}
           upstream_repo: https://github.com/sigstore/rekor
