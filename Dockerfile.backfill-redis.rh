@@ -1,6 +1,6 @@
 # Build stage
 
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1777889793@sha256:1c1259373e6feb4b57de490452379c40888cf6e876154cd2ace17eae9c64a7ea AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1779959429@sha256:a2ba4645e7c424b08aa83ed7792e279683b0d33acbc5131b18183fd21e336c55 AS build-env
 
 ENV GOEXPERIMENT=strictfipsruntime
 ENV CGO_ENABLED=1
@@ -18,7 +18,7 @@ ARG SERVER_LDFLAGS
 RUN go build -mod=readonly -trimpath -ldflags "$(SERVER_LDFLAGS)" -o backfill-redis ./cmd/backfill-index
 
 # Install stage
-FROM registry.redhat.io/rhel9/redis-6@sha256:b239d1b89f0a3d0022b06aa8b9e66b27c3ba344a907081dfd4c4fd1edd786d02
+FROM registry.redhat.io/rhel9/redis-6@sha256:1f29a65a7db2a0cb53661b4c260482f0402b595587eed3840a0f980bc71695da
 COPY --from=build-env /opt/app-root/src/backfill-redis /usr/local/bin/backfill-redis
 COPY LICENSE /licenses/license.txt
 WORKDIR /opt/app-root/src/home
