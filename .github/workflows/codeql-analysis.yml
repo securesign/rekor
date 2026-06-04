@@ -58,6 +58,12 @@ jobs:
         check-latest: true
         cache: false
 
+    - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
+      run: |
+        go mod edit -dropgodebug=fips140
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git update-index --assume-unchanged go.mod
+
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@0499de31b99561a6d14a36a5f662c2a54f91beee # v4.31.2
