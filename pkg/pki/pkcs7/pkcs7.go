@@ -31,6 +31,7 @@ import (
 
 	"github.com/sassoftware/relic/lib/pkcs7"
 	"github.com/sigstore/rekor/pkg/pki/identity"
+	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
 )
@@ -171,7 +172,13 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 		return nil, err
 	}
 	for _, cert := range certs {
-		return &PublicKey{key: cert.PublicKey, certs: certs, rawCert: cert.Raw}, nil
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if err := pkitypes.ValidatePublicKey(cert.PublicKey); err != nil {
+			return nil, err
+		}
+		// ========================================
+		return &PublicKey{key: cert.PublicKey, certs: certs, rawCert: cert.Raw}, nil //nolint:staticcheck // SA4004 pre-existing pattern: grabs first cert
 	}
 	return nil, errors.New("unable to extract public key from certificate inside PKCS7 bundle")
 }

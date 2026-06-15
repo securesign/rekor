@@ -26,7 +26,7 @@ import (
 	"github.com/go-openapi/swag/conv"
 	rclient "github.com/sigstore/rekor/pkg/generated/client"
 	"github.com/sigstore/rekor/pkg/generated/models"
-
+	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/rekor/pkg/verify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -181,6 +181,13 @@ func loadVerifier(ctx context.Context, rekorClient *rclient.Rekor, treeID string
 	if err != nil {
 		return nil, err
 	}
+
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	if err := pkitypes.ValidatePublicKey(pub); err != nil {
+		return nil, err
+	}
+	// ========================================
 
 	return signature.LoadVerifier(pub, crypto.SHA256)
 }

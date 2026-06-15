@@ -16,6 +16,7 @@
 package app
 
 import (
+	"crypto/fips140"
 	"flag"
 	"fmt"
 	"net/http"
@@ -108,17 +109,25 @@ var serveCmd = &cobra.Command{
 		// which registers each type's constructor in types.TypeMap.
 		entryTypeMap := map[string][]string{
 			rekord.KIND:       {rekord_v001.APIVERSION},
-			rpm.KIND:          {rpm_v001.APIVERSION},
 			jar.KIND:          {jar_v001.APIVERSION},
 			intoto.KIND:       {intoto_v001.APIVERSION, intoto_v002.APIVERSION},
 			cose.KIND:         {cose_v001.APIVERSION},
 			rfc3161.KIND:      {rfc3161_v001.APIVERSION},
-			alpine.KIND:       {alpine_v001.APIVERSION},
-			helm.KIND:         {helm_v001.APIVERSION},
 			tuf.KIND:          {tuf_v001.APIVERSION},
 			hashedrekord.KIND: {hashedrekord_v001.APIVERSION},
 			dsse.KIND:         {dsse_v001.APIVERSION},
 		}
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		// Alpine uses non-FIPS signature verification.
+		// Helm and RPM depend exclusively on PGP (golang.org/x/crypto/openpgp),
+		// which is not a FIPS-validated module.
+		if !fips140.Enabled() {
+			entryTypeMap[alpine.KIND] = []string{alpine_v001.APIVERSION}
+			entryTypeMap[helm.KIND] = []string{helm_v001.APIVERSION}
+			entryTypeMap[rpm.KIND] = []string{rpm_v001.APIVERSION}
+		}
+		// ========================================
 
 		// Using --enabled_entry_types, restrict which kinds the server will
 		// accept for new submissions. By default, support every type compiled

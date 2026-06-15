@@ -16,6 +16,7 @@
 package app
 
 import (
+	"crypto/fips140"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -148,20 +149,33 @@ var searchCmd = &cobra.Command{
 		if publicKeyStr != "" {
 			params.Query.PublicKey = &models.SearchIndexPublicKey{}
 			pkiFormat := viper.GetString("pki-format")
+			// RHTAS FIPS - DO NOT REMOVE
+			// ========================================
+			// PGP, SSH, and Minisign use non-FIPS-validated crypto modules.
 			switch pkiFormat {
 			case "pgp":
+				if fips140.Enabled() {
+					return nil, fmt.Errorf("pgp is not supported in FIPS mode")
+				}
 				params.Query.PublicKey.Format = conv.Pointer(models.SearchIndexPublicKeyFormatPgp)
 			case "minisign":
+				if fips140.Enabled() {
+					return nil, fmt.Errorf("minisign is not supported in FIPS mode")
+				}
 				params.Query.PublicKey.Format = conv.Pointer(models.SearchIndexPublicKeyFormatMinisign)
 			case "x509":
 				params.Query.PublicKey.Format = conv.Pointer(models.SearchIndexPublicKeyFormatX509)
 			case "ssh":
+				if fips140.Enabled() {
+					return nil, fmt.Errorf("ssh is not supported in FIPS mode")
+				}
 				params.Query.PublicKey.Format = conv.Pointer(models.SearchIndexPublicKeyFormatSSH)
 			case "tuf":
 				params.Query.PublicKey.Format = conv.Pointer(models.SearchIndexPublicKeyFormatTUF)
 			default:
 				return nil, fmt.Errorf("unknown pki-format %v", pkiFormat)
 			}
+			// ========================================
 
 			splitPubKeyString := strings.Split(publicKeyStr, ",")
 			if len(splitPubKeyString) == 1 {
