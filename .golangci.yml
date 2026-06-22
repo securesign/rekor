@@ -50,6 +50,10 @@ linters:
       - linters:
           - gosec
         text: 'G115: '
+      - linters:
+          - govet
+        # inline analyzer doesn't support type parameter inference (generics) used by slices package
+        text: 'inline: cannot inline: type parameter inference is not yet supported'
     paths:
       - third_party$
       - builtin$
