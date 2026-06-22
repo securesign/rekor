@@ -40,6 +40,14 @@ linters:
         # TODO, tracked in #286
         text: 'SA1019: package golang.org/x/crypto/openpgp'
       - linters:
+          - staticcheck
+        # Deprecated in Go 1.26 with golang.org/x/crypto v0.53.0, will be addressed in future PR
+        text: 'SA1019: ecdsaPubKey\.(X|Y) has been deprecated'
+      - linters:
+          - staticcheck
+        # Deprecated in_toto types, will be addressed in future PR
+        text: 'SA1019: in_toto\.(Statement|StatementHeader|Subject) is deprecated'
+      - linters:
           - gosec
         text: 'G115: '
     paths:
