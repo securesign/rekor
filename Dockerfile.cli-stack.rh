@@ -3,7 +3,7 @@ FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:6c991091871ebe
 FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:84af62ef90352bfcb95324d86750f9075b26e2cfd4a3655f393f224ae928c953 AS build-ppc64le
 FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:e8058370738ebaf462e4e712dd02f83291c5cb21fc30984c7c509ee5e580c0db AS build-s390x
 
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1781757851@sha256:1503a8227c00a1934e3c1a4a88e0be785786a2d9e2f62a9334e75ff2fadca2fe AS packager
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1781757851@sha256:b2c0898987b688a95f4d2f38abdfd929f45903948831783153019ab749495c72 AS packager
 USER root
 RUN mkdir -p /binaries
 
