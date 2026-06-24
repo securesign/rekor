@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM registry.redhat.io/ubi9/go-toolset:9.7-1778604137@sha256:e06a6f4c85c3ca75f64127542449c9770fb885adfb592f987c576d268ac108de AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1781757851@sha256:1503a8227c00a1934e3c1a4a88e0be785786a2d9e2f62a9334e75ff2fadca2fe AS build-env
 
 RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && mkdir -p /opt/app-root/src/cmd && mkdir -p /opt/app-root/src/pkg && git config --global --add safe.directory /opt/app-root/src
 
