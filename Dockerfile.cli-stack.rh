@@ -1,53 +1,69 @@
-FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:253f59a58a47dcf5230fd4977026787d46fed5a766174b53787787edf16befb7 AS build-amd64
-FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:6c991091871ebeb6d9aef869203a1868842e49193cb483d345685ccd88c9e64f AS build-arm64
-FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:84af62ef90352bfcb95324d86750f9075b26e2cfd4a3655f393f224ae928c953 AS build-ppc64le
-FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:e8058370738ebaf462e4e712dd02f83291c5cb21fc30984c7c509ee5e580c0db AS build-s390x
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1781757851@sha256:b2c0898987b688a95f4d2f38abdfd929f45903948831783153019ab749495c72 AS build-cross-platform
+ENV APP_ROOT=/opt/app-root \
+    GOPATH=/opt/app-root \
+    GOFLAGS="-buildvcs=false"
 
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1781757851@sha256:1503a8227c00a1934e3c1a4a88e0be785786a2d9e2f62a9334e75ff2fadca2fe AS packager
+USER root
+
+RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
+
+WORKDIR $APP_ROOT/src
+
+COPY . .
+
+WORKDIR $APP_ROOT/src/hack/tools
+RUN go mod vendor
+
+WORKDIR $APP_ROOT/src
+RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
+    git update-index --assume-unchanged Dockerfile.cli-stack.rh && \
+    go mod vendor && \
+    make Makefile.swagger && \
+    make -f Build.mak cross-platform
+
+FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:208bf21cb51b27af4029da675b7d7d115f4f6ab8b9ee356888b136fe940386ed AS build-amd64
+FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:208bf21cb51b27af4029da675b7d7d115f4f6ab8b9ee356888b136fe940386ed AS build-arm64
+FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:208bf21cb51b27af4029da675b7d7d115f4f6ab8b9ee356888b136fe940386ed AS build-ppc64le
+FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:208bf21cb51b27af4029da675b7d7d115f4f6ab8b9ee356888b136fe940386ed AS build-s390x
+
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1781757851@sha256:b2c0898987b688a95f4d2f38abdfd929f45903948831783153019ab749495c72 AS packager
 USER root
 RUN mkdir -p /binaries
 
-# Native Linux binaries from each arch variant
-COPY --from=build-amd64 /usr/local/bin/rekor_cli_linux.gz /tmp/rekor_cli_linux.gz
-RUN gzip -d /tmp/rekor_cli_linux.gz && \
-    tar -czf /binaries/rekor_cli_linux_amd64.tar.gz -C /tmp rekor_cli_linux && \
+# rekor-cli: Native Linux binaries from each arch variant
+COPY --from=build-amd64 /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_amd64.tar.gz -C /tmp rekor_cli_linux && \
     rm /tmp/rekor_cli_linux
 
-COPY --from=build-arm64 /usr/local/bin/rekor_cli_linux.gz /tmp/rekor_cli_linux.gz
-RUN gzip -d /tmp/rekor_cli_linux.gz && \
-    tar -czf /binaries/rekor_cli_linux_arm64.tar.gz -C /tmp rekor_cli_linux && \
+COPY --from=build-arm64 /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_arm64.tar.gz -C /tmp rekor_cli_linux && \
     rm /tmp/rekor_cli_linux
 
-COPY --from=build-ppc64le /usr/local/bin/rekor_cli_linux.gz /tmp/rekor_cli_linux.gz
-RUN gzip -d /tmp/rekor_cli_linux.gz && \
-    tar -czf /binaries/rekor_cli_linux_ppc64le.tar.gz -C /tmp rekor_cli_linux && \
+COPY --from=build-ppc64le /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_ppc64le.tar.gz -C /tmp rekor_cli_linux && \
     rm /tmp/rekor_cli_linux
 
-COPY --from=build-s390x /usr/local/bin/rekor_cli_linux.gz /tmp/rekor_cli_linux.gz
-RUN gzip -d /tmp/rekor_cli_linux.gz && \
-    tar -czf /binaries/rekor_cli_linux_s390x.tar.gz -C /tmp rekor_cli_linux && \
+COPY --from=build-s390x /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_s390x.tar.gz -C /tmp rekor_cli_linux && \
     rm /tmp/rekor_cli_linux
 
-# Darwin amd64
-COPY --from=build-amd64 /usr/local/bin/rekor_cli_darwin_amd64.gz /tmp/rekor_cli_darwin_amd64.gz
-RUN gzip -d /tmp/rekor_cli_darwin_amd64.gz && \
-    tar -czf /binaries/rekor_cli_darwin_amd64.tar.gz -C /tmp rekor_cli_darwin_amd64 && \
+# rekor-cli: Cross-compiled binaries
+COPY --from=build-cross-platform /opt/app-root/src/rekor_cli_darwin_amd64 /tmp/rekor_cli_darwin_amd64
+RUN tar -czf /binaries/rekor_cli_darwin_amd64.tar.gz -C /tmp rekor_cli_darwin_amd64 && \
     rm /tmp/rekor_cli_darwin_amd64
 
-# Darwin arm64
-COPY --from=build-amd64 /usr/local/bin/rekor_cli_darwin_arm64.gz /tmp/rekor_cli_darwin_arm64.gz
-RUN gzip -d /tmp/rekor_cli_darwin_arm64.gz && \
-    tar -czf /binaries/rekor_cli_darwin_arm64.tar.gz -C /tmp rekor_cli_darwin_arm64 && \
+COPY --from=build-cross-platform /opt/app-root/src/rekor_cli_darwin_arm64 /tmp/rekor_cli_darwin_arm64
+RUN tar -czf /binaries/rekor_cli_darwin_arm64.tar.gz -C /tmp rekor_cli_darwin_arm64 && \
     rm /tmp/rekor_cli_darwin_arm64
 
-# Windows amd64
-COPY --from=build-amd64 /usr/local/bin/rekor_cli_windows_amd64.exe.gz /tmp/rekor_cli_windows_amd64.exe.gz
-RUN gzip -d /tmp/rekor_cli_windows_amd64.exe.gz && \
-    tar -czf /binaries/rekor_cli_windows_amd64.tar.gz -C /tmp rekor_cli_windows_amd64.exe && \
+COPY --from=build-cross-platform /opt/app-root/src/rekor_cli_windows_amd64.exe /tmp/rekor_cli_windows_amd64.exe
+RUN tar -czf /binaries/rekor_cli_windows_amd64.tar.gz -C /tmp rekor_cli_windows_amd64.exe && \
     rm /tmp/rekor_cli_windows_amd64.exe
 
+RUN chmod -R a+rX /binaries
+
 # Final minimal image with all binaries
-FROM registry.redhat.io/ubi9/ubi-minimal@sha256:12db9874bd753eb98b1ab3d840e75de5d6842ac0604fbd68c012adefe97140be
+FROM registry.redhat.io/ubi9/ubi-micro:9.8@sha256:b498b3ea26111ab4b81d65139f2ebd2ef9a2abb7a4588b7fdcc54889f95e9caa
 
 LABEL description="Flat image containing rekor-cli binaries for all platforms and architectures"
 LABEL io.k8s.description="Flat image containing rekor-cli binaries for all platforms and architectures"
@@ -56,10 +72,9 @@ LABEL io.k8s.display-name="Rekor CLI stack image for Red Hat Trusted Artifact Si
 LABEL io.openshift.tags="rekor-cli trusted-artifact-signer cli-stack"
 LABEL summary="Provides all rekor-cli binaries as tar.gz archives for CDN distribution."
 LABEL com.redhat.component="rekor-cli-stack"
+LABEL name="rhtas/rekor-cli-stack"
 
 COPY --from=packager /binaries/ /binaries/
 COPY --from=build-amd64 /licenses/ /licenses/
-
-RUN chown -R root:0 /binaries && chmod -R g+r /binaries
 
 USER 65532:65532
