@@ -1,5 +1,5 @@
 #Build stage#
-FROM registry.redhat.io/ubi9/go-toolset:9.8@sha256:355b23fe885cf565c9313a7e98db742df0aec21456244e808942c56489594251 AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1782910875@sha256:5488ab924e20c14a7a765b8502e0798fad0e0953f67d552bf43d795583020819 AS build-env
 ENV APP_ROOT=/opt/app-root \
     GOPATH=/opt/app-root \
     CGO_ENABLED=0 \
@@ -25,7 +25,7 @@ RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
     git update-index --no-assume-unchanged Dockerfile.rekor-cli.rh
 
 #Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:83006d535923fcf1345067873524a3980316f51794f01d8655be55d6e9387183
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:463cae32c6f6f5594b11a5c22de275016bd8545ce58a6373388e8b24f13fc15c
 
 LABEL description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
 LABEL io.k8s.description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
