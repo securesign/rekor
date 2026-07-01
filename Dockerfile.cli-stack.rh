@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1782736563@sha256:83cfd595f20e494cea9dc6526f217441e60bb9c5da85b33157c761e5f6a3d852 AS build-cross-platform
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1782910875@sha256:5488ab924e20c14a7a765b8502e0798fad0e0953f67d552bf43d795583020819 AS build-cross-platform
 ENV APP_ROOT=/opt/app-root \
     GOPATH=/opt/app-root \
     GOFLAGS="-buildvcs=false"
@@ -23,7 +23,7 @@ FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:a73de552b0849a
 FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:5ca04abcce38f145e26a902552bc8b1d82e2d34d86656f704a4500ecfa3c5a13 AS build-ppc64le
 FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:f54cd5a082baf3ce56208a8b499c7bbb1bd33267cec9c9cf23614d765b0a5dc0 AS build-s390x
 
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1782736563@sha256:83cfd595f20e494cea9dc6526f217441e60bb9c5da85b33157c761e5f6a3d852 AS packager
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1782910875@sha256:5488ab924e20c14a7a765b8502e0798fad0e0953f67d552bf43d795583020819 AS packager
 USER root
 RUN mkdir -p /binaries
 
@@ -60,7 +60,7 @@ RUN tar -czf /binaries/rekor_cli_windows_amd64.tar.gz -C /tmp rekor_cli_windows_
 RUN chmod -R a+rX /binaries
 
 # Final minimal image with all binaries
-FROM registry.redhat.io/ubi9/ubi-micro:9.8-1782363471@sha256:fdf68a4f5f88cca14ae906bbec6e0fbbffe92b5b91e73e0862c961234d63b986
+FROM registry.redhat.io/ubi9/ubi-micro:9.8-1782840931@sha256:35de56a9413112f1474e392ebc35e0cf6f0fb484c8e8877bbae59b513694b41f
 
 LABEL description="Flat image containing rekor-cli binaries for all platforms and architectures"
 LABEL io.k8s.description="Flat image containing rekor-cli binaries for all platforms and architectures"
