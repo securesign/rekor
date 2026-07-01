@@ -11,9 +11,6 @@ WORKDIR $APP_ROOT/src
 
 COPY . .
 
-WORKDIR $APP_ROOT/src/hack/tools
-RUN go mod vendor
-
 WORKDIR $APP_ROOT/src
 RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
     git update-index --assume-unchanged Dockerfile.cli-stack.rh && \
