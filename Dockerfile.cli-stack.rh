@@ -21,10 +21,10 @@ RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
     make Makefile.swagger && \
     make -f Build.mak cross-platform
 
-FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:0bbeaf5bf98bce31979d0e9ba6b767dd773194aee30388785281d0140c114d09 AS build-amd64
-FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:0bbeaf5bf98bce31979d0e9ba6b767dd773194aee30388785281d0140c114d09 AS build-arm64
-FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:0bbeaf5bf98bce31979d0e9ba6b767dd773194aee30388785281d0140c114d09 AS build-ppc64le
-FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:0bbeaf5bf98bce31979d0e9ba6b767dd773194aee30388785281d0140c114d09 AS build-s390x
+FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:99ad3edabd4c65f41d611f0d724451c5d94a67837f167401a8b1f75185ad0508 AS build-amd64
+FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:a73de552b0849a39fb9bdad410bae04b00361d10e76a6587d71cb9100b67b845 AS build-arm64
+FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:5ca04abcce38f145e26a902552bc8b1d82e2d34d86656f704a4500ecfa3c5a13 AS build-ppc64le
+FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:f54cd5a082baf3ce56208a8b499c7bbb1bd33267cec9c9cf23614d765b0a5dc0 AS build-s390x
 
 FROM registry.redhat.io/ubi9/go-toolset:9.8-1782377916@sha256:17c888d75753f128f6cbdc5587932c3abd2632ca8e0931aa27b9a60c7a75ac62 AS packager
 USER root
