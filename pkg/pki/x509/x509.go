@@ -30,6 +30,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/sigstore/rekor/pkg/pki/identity"
+	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
 )
@@ -129,6 +130,14 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 		if err != nil {
 			return nil, err
 		}
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		for _, c := range certs {
+			if err := pkitypes.ValidatePublicKey(c.PublicKey); err != nil {
+				return nil, err
+			}
+		}
+		// ========================================
 		return &PublicKey{certs: certs}, nil
 	}
 
@@ -138,12 +147,24 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 		if err != nil {
 			return nil, err
 		}
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if err := pkitypes.ValidatePublicKey(key); err != nil {
+			return nil, err
+		}
+		// ========================================
 		return &PublicKey{key: key}, nil
 	case string(cryptoutils.CertificatePEMType):
 		c, err := x509.ParseCertificate(block.Bytes)
 		if err != nil {
 			return nil, err
 		}
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if err := pkitypes.ValidatePublicKey(c.PublicKey); err != nil {
+			return nil, err
+		}
+		// ========================================
 		return &PublicKey{
 			cert: &cert{
 				c: c,

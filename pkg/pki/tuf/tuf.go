@@ -17,6 +17,7 @@ package tuf
 
 import (
 	"crypto/ed25519"
+	"crypto/fips140"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/hex"
@@ -126,6 +127,12 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 	// Now create a verification db that trusts all the keys
 	db := verify.NewDB()
 	for id, k := range root.Keys {
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if fips140.Enabled() && k.Type == data.KeyTypeEd25519 {
+			return nil, errors.New("ed25519 is not supported in FIPS mode")
+		}
+		// ========================================
 		if err := db.AddKey(id, k); err != nil {
 			return nil, err
 		}

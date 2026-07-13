@@ -16,11 +16,44 @@
 package pki
 
 import (
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/fips140"
+	"crypto/rsa"
+	"errors"
+	"fmt"
 	"io"
 
 	"github.com/sigstore/rekor/pkg/pki/identity"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
 )
+
+// RHTAS FIPS - DO NOT REMOVE
+// ========================================
+// ValidatePublicKey checks whether a crypto.PublicKey uses a FIPS-approved
+// algorithm. Returns nil when FIPS mode is disabled or when the key is approved.
+// Approved: RSA (>= 2048-bit), ECDSA. Rejected: Ed25519, DSA, all others.
+func ValidatePublicKey(pub crypto.PublicKey) error {
+	if !fips140.Enabled() {
+		return nil
+	}
+	switch k := pub.(type) {
+	case *rsa.PublicKey:
+		if k.N.BitLen() < 2048 {
+			return fmt.Errorf("RSA key size %d below FIPS minimum 2048", k.N.BitLen())
+		}
+		return nil
+	case *ecdsa.PublicKey:
+		return nil
+	case ed25519.PublicKey:
+		return errors.New("ed25519 is not supported in FIPS mode")
+	default:
+		return fmt.Errorf("unsupported key type %T in FIPS mode", pub)
+	}
+}
+
+// ========================================
 
 // PublicKey Generic object representing a public key (regardless of format & algorithm)
 type PublicKey interface {

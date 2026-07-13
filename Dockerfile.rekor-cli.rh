@@ -1,0 +1,43 @@
+#Build stage#
+FROM registry.redhat.io/ubi9/go-toolset:9.8@sha256:355b23fe885cf565c9313a7e98db742df0aec21456244e808942c56489594251 AS build-env
+ENV APP_ROOT=/opt/app-root \
+    GOPATH=/opt/app-root \
+    CGO_ENABLED=0 \
+    GOFLAGS="-buildvcs=false -tags=no_openssl" \
+    GOFIPS140=v1.0.0
+
+USER root
+
+RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
+
+WORKDIR /opt/app-root/src
+
+COPY . .
+
+WORKDIR /opt/app-root/src/hack/tools
+RUN go mod vendor
+
+WORKDIR /opt/app-root/src
+RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
+    go mod vendor && \
+    make Makefile.swagger && \
+    make -f Build.mak rekor-cli-linux && \
+    git update-index --no-assume-unchanged Dockerfile.rekor-cli.rh
+
+#Install stage
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:83006d535923fcf1345067873524a3980316f51794f01d8655be55d6e9387183
+
+LABEL description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
+LABEL io.k8s.description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
+LABEL io.k8s.display-name="Rekor-cli container image for Red Hat Trusted Signer"
+LABEL io.openshift.tags="rekor-cli trusted-signer"
+LABEL summary="Provides the rekor CLI binary for interacting with a rekor server"
+LABEL com.redhat.component="rekor-cli"
+LABEL name="rhtas/rekor-cli-rhel9"
+
+COPY --from=build-env /opt/app-root/src/rekor_cli_linux /usr/local/bin/rekor_cli_linux
+
+COPY LICENSE /licenses/license.txt
+WORKDIR /opt/app-root/src/home
+
+USER 65532:65532

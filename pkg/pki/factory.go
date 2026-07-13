@@ -16,6 +16,7 @@
 package pki
 
 import (
+	"crypto/fips140"
 	"fmt"
 	"io"
 
@@ -58,30 +59,6 @@ var artifactFactoryMap map[Format]pkiImpl
 
 func init() {
 	artifactFactoryMap = map[Format]pkiImpl{
-		PGP: {
-			newPubKey: func(r io.Reader) (PublicKey, error) {
-				return pgp.NewPublicKey(r)
-			},
-			newSignature: func(r io.Reader) (Signature, error) {
-				return pgp.NewSignature(r)
-			},
-		},
-		Minisign: {
-			newPubKey: func(r io.Reader) (PublicKey, error) {
-				return minisign.NewPublicKey(r)
-			},
-			newSignature: func(r io.Reader) (Signature, error) {
-				return minisign.NewSignature(r)
-			},
-		},
-		SSH: {
-			newPubKey: func(r io.Reader) (PublicKey, error) {
-				return ssh.NewPublicKey(r)
-			},
-			newSignature: func(r io.Reader) (Signature, error) {
-				return ssh.NewSignature(r)
-			},
-		},
 		X509: {
 			newPubKey: func(r io.Reader) (PublicKey, error) {
 				return x509.NewPublicKey(r)
@@ -107,6 +84,38 @@ func init() {
 			},
 		},
 	}
+
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	// PGP (golang.org/x/crypto/openpgp), SSH (golang.org/x/crypto/ssh), and
+	// Minisign (ed25519-only) use non-FIPS-validated crypto modules.
+	if !fips140.Enabled() {
+		artifactFactoryMap[PGP] = pkiImpl{
+			newPubKey: func(r io.Reader) (PublicKey, error) {
+				return pgp.NewPublicKey(r)
+			},
+			newSignature: func(r io.Reader) (Signature, error) {
+				return pgp.NewSignature(r)
+			},
+		}
+		artifactFactoryMap[SSH] = pkiImpl{
+			newPubKey: func(r io.Reader) (PublicKey, error) {
+				return ssh.NewPublicKey(r)
+			},
+			newSignature: func(r io.Reader) (Signature, error) {
+				return ssh.NewSignature(r)
+			},
+		}
+		artifactFactoryMap[Minisign] = pkiImpl{
+			newPubKey: func(r io.Reader) (PublicKey, error) {
+				return minisign.NewPublicKey(r)
+			},
+			newSignature: func(r io.Reader) (Signature, error) {
+				return minisign.NewSignature(r)
+			},
+		}
+	}
+	// ========================================
 }
 
 func SupportedFormats() []string {

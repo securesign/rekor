@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"crypto"
+	"crypto/fips140"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -360,12 +361,32 @@ func (v V001Entry) CreateFromArtifactProperties(ctx context.Context, props types
 	re.RekordObj.Signature = &models.RekordV001SchemaSignature{}
 	switch props.PKIFormat {
 	case "pgp":
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		// PGP uses golang.org/x/crypto/openpgp which is not FIPS-validated.
+		if fips140.Enabled() {
+			return nil, errors.New("pgp is not supported in FIPS mode")
+		}
+		// ========================================
 		re.RekordObj.Signature.Format = conv.Pointer(models.RekordV001SchemaSignatureFormatPgp)
 	case "minisign":
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if fips140.Enabled() {
+			return nil, errors.New("minisign is not supported in FIPS mode")
+		}
+		// ========================================
 		re.RekordObj.Signature.Format = conv.Pointer(models.RekordV001SchemaSignatureFormatMinisign)
 	case "x509":
 		re.RekordObj.Signature.Format = conv.Pointer(models.RekordV001SchemaSignatureFormatX509)
 	case "ssh":
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		// SSH uses golang.org/x/crypto/ssh which is not FIPS-validated.
+		if fips140.Enabled() {
+			return nil, errors.New("ssh is not supported in FIPS mode")
+		}
+		// ========================================
 		re.RekordObj.Signature.Format = conv.Pointer(models.RekordV001SchemaSignatureFormatSSH)
 	default:
 		return nil, fmt.Errorf("unexpected format of public key: %s", props.PKIFormat)
@@ -422,18 +443,31 @@ func (v V001Entry) Verifiers() ([]pki.PublicKey, error) {
 
 	var key pki.PublicKey
 	var err error
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	// PGP, SSH, and Minisign use non-FIPS-validated crypto modules.
 	switch f := *v.RekordObj.Signature.Format; f {
 	case "x509":
 		key, err = x509.NewPublicKey(bytes.NewReader(*v.RekordObj.Signature.PublicKey.Content))
 	case "ssh":
+		if fips140.Enabled() {
+			return nil, errors.New("ssh is not supported in FIPS mode")
+		}
 		key, err = ssh.NewPublicKey(bytes.NewReader(*v.RekordObj.Signature.PublicKey.Content))
 	case "pgp":
+		if fips140.Enabled() {
+			return nil, errors.New("pgp is not supported in FIPS mode")
+		}
 		key, err = pgp.NewPublicKey(bytes.NewReader(*v.RekordObj.Signature.PublicKey.Content))
 	case "minisign":
+		if fips140.Enabled() {
+			return nil, errors.New("minisign is not supported in FIPS mode")
+		}
 		key, err = minisign.NewPublicKey(bytes.NewReader(*v.RekordObj.Signature.PublicKey.Content))
 	default:
 		return nil, fmt.Errorf("unexpected format of public key: %s", f)
 	}
+	// ========================================
 	if err != nil {
 		return nil, err
 	}

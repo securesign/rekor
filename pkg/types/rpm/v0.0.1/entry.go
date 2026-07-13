@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"crypto"
+	"crypto/fips140"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -49,6 +50,12 @@ const (
 )
 
 func init() {
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	if fips140.Enabled() {
+		return
+	}
+	// ========================================
 	if err := rpm.VersionMap.SetEntryFactory(APIVERSION, NewEntry); err != nil {
 		log.Logger.Panic(err)
 	}
