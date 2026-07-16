@@ -88,7 +88,7 @@ func init() {
 	// RHTAS FIPS - DO NOT REMOVE
 	// ========================================
 	// PGP (golang.org/x/crypto/openpgp), SSH (golang.org/x/crypto/ssh), and
-	// Minisign (ed25519-only) use non-FIPS-validated crypto modules.
+	// Minisign (golang.org/x/crypto/blake2b) use non-FIPS-validated crypto modules.
 	if !fips140.Enabled() {
 		artifactFactoryMap[PGP] = pkiImpl{
 			newPubKey: func(r io.Reader) (PublicKey, error) {

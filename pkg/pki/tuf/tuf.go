@@ -16,6 +16,7 @@
 package tuf
 
 import (
+	"crypto"
 	"crypto/ed25519"
 	"crypto/fips140"
 	"crypto/sha256"
@@ -29,6 +30,7 @@ import (
 
 	"github.com/cyberphone/json-canonicalization/go/src/webpki.org/jsoncanonicalizer"
 	"github.com/sigstore/rekor/pkg/pki/identity"
+	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
 	"github.com/theupdateframework/go-tuf/data"
@@ -129,8 +131,26 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 	for id, k := range root.Keys {
 		// RHTAS FIPS - DO NOT REMOVE
 		// ========================================
-		if fips140.Enabled() && k.Type == data.KeyTypeEd25519 {
-			return nil, errors.New("ed25519 is not supported in FIPS mode")
+		if fips140.Enabled() {
+			verifier, err := keys.GetVerifier(k)
+			if err != nil {
+				return nil, err
+			}
+			var pub crypto.PublicKey
+			switch k.Type {
+			case data.KeyTypeRSASSA_PSS_SHA256, "ecdsa-sha2-nistp256", "ecdsa":
+				pub, err = x509.ParsePKIXPublicKey([]byte(verifier.Public()))
+				if err != nil {
+					return nil, err
+				}
+			case data.KeyTypeEd25519:
+				pub = ed25519.PublicKey(verifier.Public())
+			}
+			if pub != nil {
+				if err := pkitypes.ValidatePublicKey(pub); err != nil {
+					return nil, err
+				}
+			}
 		}
 		// ========================================
 		if err := db.AddKey(id, k); err != nil {
