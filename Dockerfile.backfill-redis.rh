@@ -11,6 +11,7 @@ RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && git config --global 
 
 WORKDIR /opt/app-root/src/
 COPY . .
+RUN go mod edit -godebug=fips140=auto
 
 RUN go mod download
 

@@ -69,24 +69,6 @@ var AllowedClientSigningAlgorithms = []v1.PublicKeyDetails{
 }
 var DefaultClientSigningAlgorithms = AllowedClientSigningAlgorithms
 
-// RHTAS FIPS - DO NOT REMOVE
-// ========================================
-func init() {
-	if fips140.Enabled() {
-		filtered := make([]v1.PublicKeyDetails, 0, len(AllowedClientSigningAlgorithms))
-		for _, a := range AllowedClientSigningAlgorithms {
-			if a == v1.PublicKeyDetails_PKIX_ED25519 || a == v1.PublicKeyDetails_PKIX_ED25519_PH {
-				continue
-			}
-			filtered = append(filtered, a)
-		}
-		AllowedClientSigningAlgorithms = filtered
-		DefaultClientSigningAlgorithms = AllowedClientSigningAlgorithms
-	}
-}
-
-// ========================================
-
 func NewAPI(treeID int64) (*API, error) {
 	ctx := context.Background()
 

@@ -20,6 +20,8 @@ spec:
   params:
   - name: dockerfile
     value: Dockerfile.cli-stack.rh
+  - name: ALLOW_CROSS_PLATFORM_IMAGES
+    value: "true"
   - name: git-url
     value: '{{repo_url}}'
   - name: image-expires-after
