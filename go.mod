@@ -2,8 +2,6 @@ module github.com/sigstore/rekor
 
 go 1.26.3
 
-godebug fips140=auto
-
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/blang/semver v3.5.1+incompatible
