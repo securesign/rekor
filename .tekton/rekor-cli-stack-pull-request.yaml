@@ -20,6 +20,8 @@ spec:
   params:
   - name: dockerfile
     value: Dockerfile.cli-stack.rh
+  - name: ALLOW_CROSS_PLATFORM_IMAGES
+    value: "true"
   - name: git-url
     value: '{{repo_url}}'
   - name: image-expires-after
@@ -33,6 +35,8 @@ spec:
   - name: hermetic
     value: "false"
   - name: build-source-image
+    value: "true"
+  - name: ALLOW_CROSS_PLATFORM_IMAGES
     value: "true"
   pipelineRef:
     params:

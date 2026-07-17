@@ -28,8 +28,8 @@ SERVER_LDFLAGS=$(REKOR_LDFLAGS)
 FIPS_MODULE ?= v1.0.0
 
 .PHONY: rekor-cli-linux
-rekor-cli-linux: ## Build native Linux binary (FIPS, CGO)
-	env CGO_ENABLED=1 GOEXPERIMENT=strictfipsruntime GOFLAGS="-buildvcs=false" go build -o rekor_cli_linux -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+rekor-cli-linux: ## Build native Linux binary (FIPS)
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOFLAGS="-buildvcs=false -tags=no_openssl" go build -o rekor_cli_linux -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
 
 .PHONY:
 cross-platform: rekor-cli-darwin-arm64 rekor-cli-darwin-amd64 rekor-cli-windows ## Build all distributable (cross-platform) binaries

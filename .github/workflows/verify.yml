@@ -40,12 +40,6 @@ jobs:
         with:
           go-version: ${{ env.GOVERSION }}
 
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: Install addlicense
         run: go install github.com/google/addlicense@v1.0.0
 
@@ -69,12 +63,6 @@ jobs:
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version: ${{ env.GOVERSION }}
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@82606bf257cbaff209d206a39f5134f0cfbfd2ee # v9.2.1
