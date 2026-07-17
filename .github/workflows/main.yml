@@ -44,12 +44,6 @@ jobs:
           go-version: ${{ env.GOVERSION }}
           cache: false
 
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: Build
         run: make -C $GITHUB_WORKSPACE all
       - name: Fuzz-Build
@@ -76,12 +70,6 @@ jobs:
         with:
           go-version: ${{ env.GOVERSION }}
           cache: false
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
 
       - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d # v0.9
 
@@ -113,13 +101,6 @@ jobs:
         with:
           go-version: ${{ env.GOVERSION }}
           cache: false
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: install gocovmerge
         run: make gocovmerge
 
@@ -172,13 +153,6 @@ jobs:
         with:
           go-version: ${{ env.GOVERSION }}
           cache: false
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: Install backfill test dependencies
         run: |
           go install ./cmd/rekor-cli
@@ -229,12 +203,6 @@ jobs:
           go-version: ${{ env.GOVERSION }}
           cache: false
 
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: Sharding Test
         run: ./tests/sharding-e2e-test.sh
       - name: Upload logs if they exist
@@ -253,13 +221,6 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: Docker Build
         run: docker compose build
       - name: Extract version of Go to use
@@ -287,13 +248,6 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git update-index --assume-unchanged go.mod
-
       - name: Docker Build
         run: docker compose build
       - name: Extract version of Go to use
@@ -340,15 +294,6 @@ jobs:
           go-version: ${{ env.GOVERSION }}
           check-latest: true
           cache: false
-
-      - name: Remove RHTAS FIPS godebug for upstream Go # RHTAS FIPS - DO NOT REMOVE
-        run: |
-          go mod edit -dropgodebug=fips140
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git config user.email "ci@rhtas.dev"
-          git config user.name "CI"
-          git add go.mod
-          git commit -m "temp: drop fips140 godebug for CI"
 
       - name: Run test harness
         run: ./tests/rekor-harness.sh

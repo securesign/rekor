@@ -25,7 +25,7 @@ REKOR_LDFLAGS=-X sigs.k8s.io/release-utils/version.gitVersion=$(GIT_VERSION) \
 
 CLI_LDFLAGS=$(REKOR_LDFLAGS)
 SERVER_LDFLAGS=$(REKOR_LDFLAGS)
-FIPS_MODULE ?= v1.0.0
+FIPS_MODULE ?= latest
 
 .PHONY: rekor-cli-linux
 rekor-cli-linux: ## Build native Linux binary (FIPS, CGO)
@@ -36,12 +36,12 @@ cross-platform: rekor-cli-darwin-arm64 rekor-cli-darwin-amd64 rekor-cli-windows 
 
 .PHONY:	rekor-cli-darwin-arm64
 rekor-cli-darwin-arm64: $(SRCS)## Build for mac M1
-	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=darwin GOARCH=arm64 go build -v -o rekor_cli_darwin_arm64 -tags=no_openssl -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=darwin GOARCH=arm64 go build -v -o rekor_cli_darwin_arm64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
 
 .PHONY: rekor-cli-darwin-amd64
 rekor-cli-darwin-amd64:  $(SRCS)## Build for Darwin (macOS)
-	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=darwin GOARCH=amd64 go build -o rekor_cli_darwin_amd64 -tags=no_openssl -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=darwin GOARCH=amd64 go build -o rekor_cli_darwin_amd64 -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
 
 .PHONY: rekor-cli-windows
 rekor-cli-windows: $(SRCS) ## Build for Windows
-	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=windows GOARCH=amd64 go build -o rekor_cli_windows_amd64.exe -tags=no_openssl -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
+	env CGO_ENABLED=0 GOFIPS140=$(FIPS_MODULE) GOOS=windows GOARCH=amd64 go build -o rekor_cli_windows_amd64.exe -trimpath -ldflags "$(CLI_LDFLAGS) -w -s" ./cmd/rekor-cli
