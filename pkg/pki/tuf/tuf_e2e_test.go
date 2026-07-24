@@ -21,7 +21,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/theupdateframework/go-tuf"
+	"github.com/theupdateframework/go-tuf/v2"
 )
 
 func generateTestRepo(t *testing.T, files map[string][]byte) tuf.LocalStore {
