@@ -19,7 +19,8 @@ all: rekor-cli rekor-server ## Build all binaries (rekor-cli and rekor-server)
 
 include Makefile.swagger
 
-OPENAPIDEPS = openapi.yaml $(shell find pkg/types -iname "*.json")
+SWAGGER_TEMPLATE_DIR := hack/swagger-templates
+OPENAPIDEPS = openapi.yaml $(shell find pkg/types -iname "*.json") $(shell find $(SWAGGER_TEMPLATE_DIR) -iname "*.gotmpl")
 SRCS = $(shell find cmd -iname "*.go") $(shell find pkg -iname "*.go"|grep -v pkg/generated) pkg/generated/restapi/configure_rekor_server.go $(SWAGGER_GEN)
 TOOLS_DIR := hack/tools
 TOOLS_BIN_DIR := $(abspath $(TOOLS_DIR)/bin)
@@ -44,7 +45,7 @@ ifeq ($(DIFF), 1)
     GIT_TREESTATE = "dirty"
 endif
 
-KO_PREFIX ?= gcr.io/projectsigstore
+KO_PREFIX ?= ghcr.io/sigstore/rekor
 export KO_DOCKER_REPO=$(KO_PREFIX)
 REKOR_YAML ?= rekor-$(GIT_VERSION).yaml
 GHCR_PREFIX ?= ghcr.io/sigstore/rekor
@@ -65,10 +66,10 @@ SERVER_LDFLAGS=$(REKOR_LDFLAGS)
 
 Makefile.swagger: $(SWAGGER) $(OPENAPIDEPS) ## Generate Swagger code and Makefile
 	$(SWAGGER) validate openapi.yaml
-	$(SWAGGER) generate client -f openapi.yaml -q -r COPYRIGHT.txt -t pkg/generated --additional-initialism=TUF --additional-initialism=DSSE
-	$(SWAGGER) generate server -f openapi.yaml -q -r COPYRIGHT.txt -t pkg/generated --exclude-main -A rekor_server --flag-strategy=pflag --default-produces application/json --additional-initialism=TUF --additional-initialism=DSSE
+	$(SWAGGER) generate client -f openapi.yaml -q -r COPYRIGHT.txt -t pkg/generated -T $(SWAGGER_TEMPLATE_DIR) --allow-template-override --additional-initialism=TUF --additional-initialism=DSSE
+	$(SWAGGER) generate server -f openapi.yaml -q -r COPYRIGHT.txt -t pkg/generated -T $(SWAGGER_TEMPLATE_DIR) --allow-template-override --exclude-main -A rekor_server --flag-strategy=pflag --default-produces application/json --additional-initialism=TUF --additional-initialism=DSSE
 	@echo "# This file is generated after swagger runs as part of the build; do not edit!" > Makefile.swagger
-	@echo "SWAGGER_GEN=`find pkg/generated/client pkg/generated/models pkg/generated/restapi -iname '*.go' | grep -v 'configure_rekor_server' | sort -d | tr '\n' ' ' | sed 's/ $$//'`" >> Makefile.swagger;
+	@echo "SWAGGER_GEN=`find pkg/generated/client pkg/generated/models pkg/generated/restapi -iname '*.go' ! -iname '*_test.go' | grep -v 'configure_rekor_server' | sort -d | tr '\n' ' ' | sed 's/ $$//'`" >> Makefile.swagger;
 
 lint: ## Run golangci-lint checks
 	$(GOBIN)/golangci-lint run -v ./...
@@ -138,6 +139,7 @@ e2e: ## Build and prepare end-to-end tests
 sign-keyless-ci: ko ## Sign container images using keyless signing
 	cosign sign --yes -a GIT_HASH=$(GIT_HASH) $(KO_DOCKER_REPO)/rekor-server:$(GIT_HASH)
 	cosign sign --yes -a GIT_HASH=$(GIT_HASH) $(KO_DOCKER_REPO)/rekor-cli:$(GIT_HASH)
+	cosign sign --yes -a GIT_HASH=$(GIT_HASH) $(KO_DOCKER_REPO)/backfill-index:$(GIT_HASH)
 
 ko-local: ## Build container images locally using ko
 	KO_DOCKER_REPO=ko.local LDFLAGS="$(SERVER_LDFLAGS)" GIT_HASH=$(GIT_HASH) GIT_VERSION=$(GIT_VERSION) \

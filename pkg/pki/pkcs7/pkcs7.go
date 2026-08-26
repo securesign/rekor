@@ -29,7 +29,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/sassoftware/relic/lib/pkcs7"
+	"github.com/sassoftware/relic/v8/lib/pkcs7"
 	"github.com/sigstore/rekor/pkg/pki/identity"
 	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
@@ -110,8 +110,8 @@ func (s Signature) CanonicalValue() ([]byte, error) {
 }
 
 // Verify implements the pki.Signature interface
-func (s Signature) Verify(r io.Reader, _ interface{}, _ ...sigsig.VerifyOption) error {
-	if len(*s.raw) == 0 {
+func (s Signature) Verify(r io.Reader, _ any, _ ...sigsig.VerifyOption) error {
+	if s.raw == nil || len(*s.raw) == 0 {
 		return errors.New("PKCS7 signature has not been initialized")
 	}
 
@@ -213,7 +213,9 @@ func (k PublicKey) EmailAddresses() []string {
 
 	for _, name := range cert.Subject.Names {
 		if name.Type.Equal(EmailAddressOID) {
-			names = append(names, strings.ToLower(name.Value.(string)))
+			if v, ok := name.Value.(string); ok {
+				names = append(names, strings.ToLower(v))
+			}
 		}
 	}
 
@@ -224,6 +226,9 @@ func (k PublicKey) EmailAddresses() []string {
 func (k PublicKey) Subjects() []string {
 	// combine identities in the subject and SANs
 	identities := k.EmailAddresses()
+	if len(k.certs) == 0 {
+		return identities
+	}
 	cert, err := x509.ParseCertificate(k.certs[0].Raw)
 	if err != nil {
 		// This should not happen from a valid PublicKey, but fail gracefully.
@@ -235,6 +240,9 @@ func (k PublicKey) Subjects() []string {
 
 // Identities implements the pki.PublicKey interface
 func (k PublicKey) Identities() ([]identity.Identity, error) {
+	if k.key == nil || len(k.certs) == 0 {
+		return nil, errors.New("PKCS7 public key has not been initialized")
+	}
 	// pkcs7 structure may contain both a key and certificate chain
 	pkixKey, err := cryptoutils.MarshalPublicKeyToDER(k.key)
 	if err != nil {

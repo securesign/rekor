@@ -50,7 +50,7 @@ func New() types.TypeImpl {
 	return &bat
 }
 
-var VersionMap = types.NewSemVerEntryFactoryMap()
+var VersionMap = types.NewEntryFactoryMap()
 
 func (bat *BaseAlpineType) UnmarshalEntry(pe models.ProposedEntry) (types.EntryImpl, error) {
 	if pe == nil {
@@ -60,6 +60,9 @@ func (bat *BaseAlpineType) UnmarshalEntry(pe models.ProposedEntry) (types.EntryI
 	apk, ok := pe.(*models.Alpine)
 	if !ok {
 		return nil, errors.New("cannot unmarshal non-Alpine types")
+	}
+	if apk == nil {
+		return nil, errors.New("proposed entry cannot be nil")
 	}
 
 	if apk.APIVersion == nil {
