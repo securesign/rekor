@@ -16,6 +16,7 @@
 package app
 
 import (
+	"crypto/fips140"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -120,7 +121,15 @@ func initializePFlagMap() {
 				}
 				return nil
 			}
-			return valueFactory(pkiFormatFlag, pkiFormatValidator, "x509")
+			// RHTAS FIPS - DO NOT REMOVE
+			// ========================================
+			// PGP uses non-FIPS-validated crypto modules.
+			defaultPkiFormat := "pgp"
+			if fips140.Enabled() {
+				defaultPkiFormat = "x509"
+			}
+			return valueFactory(pkiFormatFlag, pkiFormatValidator, defaultPkiFormat)
+			// ========================================
 		},
 		typeFlag: func() pflag.Value {
 			// this ensures the type of the log entry matches a type supported in the CLI

@@ -1,0 +1,81 @@
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1784751462@sha256:5f5c97d7e6d917b8328321bcf2c9d5700de65b72d434ecdbbba6f35aaebaad40 AS build-cross-platform
+ENV APP_ROOT=/opt/app-root \
+    GOPATH=/opt/app-root \
+    GOFLAGS="-buildvcs=false"
+
+USER root
+
+RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && git config --global --add safe.directory /opt/app-root/src
+
+WORKDIR $APP_ROOT/src
+
+COPY . .
+RUN go mod edit -godebug=fips140=auto
+
+WORKDIR $APP_ROOT/src/hack/tools
+RUN go mod vendor
+
+WORKDIR $APP_ROOT/src
+RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
+    git update-index --assume-unchanged Dockerfile.cli-stack.rh && \
+    go mod vendor && \
+    make Makefile.swagger && \
+    make -f Build.mak cross-platform
+
+FROM --platform=linux/amd64   quay.io/securesign/rekor-cli@sha256:95314d6a67b644f7af33b5fcd3c19812083fa59562194a522e7a1dff6528f654 AS build-amd64
+FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:68931b10d94394d4541612def4458f93b12c744f76ce69f2c27999c8c721fb06 AS build-arm64
+FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:23d78faa9a03044b6e871aec58e0c47c92583e98f935b02a7bc9c0cf82367c43 AS build-ppc64le
+FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:c6e3fe044789e052af5e127080626b84c54cf1cee0ced05833fe73b5f1b78c8c AS build-s390x
+
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1784751462@sha256:5f5c97d7e6d917b8328321bcf2c9d5700de65b72d434ecdbbba6f35aaebaad40 AS packager
+USER root
+RUN mkdir -p /binaries
+
+# rekor-cli: Native Linux binaries from each arch variant
+COPY --from=build-amd64 /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_amd64.tar.gz -C /tmp rekor_cli_linux && \
+    rm /tmp/rekor_cli_linux
+
+COPY --from=build-arm64 /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_arm64.tar.gz -C /tmp rekor_cli_linux && \
+    rm /tmp/rekor_cli_linux
+
+COPY --from=build-ppc64le /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_ppc64le.tar.gz -C /tmp rekor_cli_linux && \
+    rm /tmp/rekor_cli_linux
+
+COPY --from=build-s390x /usr/local/bin/rekor_cli_linux /tmp/rekor_cli_linux
+RUN tar -czf /binaries/rekor_cli_linux_s390x.tar.gz -C /tmp rekor_cli_linux && \
+    rm /tmp/rekor_cli_linux
+
+# rekor-cli: Cross-compiled binaries
+COPY --from=build-cross-platform /opt/app-root/src/rekor_cli_darwin_amd64 /tmp/rekor_cli_darwin_amd64
+RUN tar -czf /binaries/rekor_cli_darwin_amd64.tar.gz -C /tmp rekor_cli_darwin_amd64 && \
+    rm /tmp/rekor_cli_darwin_amd64
+
+COPY --from=build-cross-platform /opt/app-root/src/rekor_cli_darwin_arm64 /tmp/rekor_cli_darwin_arm64
+RUN tar -czf /binaries/rekor_cli_darwin_arm64.tar.gz -C /tmp rekor_cli_darwin_arm64 && \
+    rm /tmp/rekor_cli_darwin_arm64
+
+COPY --from=build-cross-platform /opt/app-root/src/rekor_cli_windows_amd64.exe /tmp/rekor_cli_windows_amd64.exe
+RUN tar -czf /binaries/rekor_cli_windows_amd64.tar.gz -C /tmp rekor_cli_windows_amd64.exe && \
+    rm /tmp/rekor_cli_windows_amd64.exe
+
+RUN chmod -R a+rX /binaries
+
+# Final minimal image with all binaries
+FROM registry.redhat.io/ubi9/ubi-micro:9.8-1784702951@sha256:b1e86b97028b8fcfb6d85f997c39e6b6b67496163ef8d80d243220a4918e8bef
+
+LABEL description="Flat image containing rekor-cli binaries for all platforms and architectures"
+LABEL io.k8s.description="Flat image containing rekor-cli binaries for all platforms and architectures"
+LABEL io.opencontainers.image.description="Flat image containing rekor-cli binaries for all platforms and architectures"
+LABEL io.k8s.display-name="Rekor CLI stack image for Red Hat Trusted Artifact Signer"
+LABEL io.openshift.tags="rekor-cli trusted-artifact-signer cli-stack"
+LABEL summary="Provides all rekor-cli binaries as tar.gz archives for CDN distribution."
+LABEL com.redhat.component="rekor-cli-stack"
+LABEL name="rhtas/rekor-cli-stack"
+
+COPY --from=packager /binaries/ /binaries/
+COPY --from=build-amd64 /licenses/ /licenses/
+
+USER 65532:65532
