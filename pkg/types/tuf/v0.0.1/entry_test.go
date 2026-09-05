@@ -31,8 +31,8 @@ import (
 	"github.com/go-openapi/swag/conv"
 	"github.com/sigstore/rekor/pkg/generated/models"
 	"github.com/sigstore/rekor/pkg/types"
-	"github.com/theupdateframework/go-tuf/data"
-	"github.com/theupdateframework/go-tuf/verify"
+	"github.com/theupdateframework/go-tuf/v2/data"
+	"github.com/theupdateframework/go-tuf/v2/verify"
 
 	"go.uber.org/goleak"
 )
