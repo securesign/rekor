@@ -30,6 +30,7 @@ import (
 	"fmt"
 	"strings"
 
+	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/sigstore/pkg/signature"
 	"github.com/sigstore/sigstore/pkg/signature/options"
 	"golang.org/x/mod/sumdb/note"
@@ -54,6 +55,14 @@ func (s *SignedNote) Sign(identity string, signer signature.Signer, opts signatu
 	if err != nil {
 		return nil, fmt.Errorf("retrieving public key: %w", err)
 	}
+
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	if err := pkitypes.ValidatePublicKey(pk); err != nil {
+		return nil, err
+	}
+	// ========================================
+
 	pkHash, err := getPublicKeyHash(pk)
 	if err != nil {
 		return nil, err
@@ -99,6 +108,12 @@ func (s SignedNote) Verify(verifier signature.Verifier) bool {
 		}
 
 		opts := []signature.VerifyOption{}
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if err := pkitypes.ValidatePublicKey(pk); err != nil {
+			return false
+		}
+		// ========================================
 		switch pk.(type) {
 		case *rsa.PublicKey, *ecdsa.PublicKey:
 			opts = append(opts, options.WithDigest(digest[:]))

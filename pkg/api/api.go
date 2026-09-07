@@ -17,6 +17,7 @@ package api
 
 import (
 	"context"
+	"crypto/fips140"
 	"crypto/tls"
 	"fmt"
 	"slices"
@@ -138,6 +139,12 @@ func NewAPI(treeID int64) (*API, error) {
 			if err != nil {
 				return nil, fmt.Errorf("parsing signature algorithm flag: %w", err)
 			}
+			// RHTAS FIPS - DO NOT REMOVE
+			// ========================================
+			if fips140.Enabled() && !slices.Contains(AllowedClientSigningAlgorithms, algorithm) {
+				return nil, fmt.Errorf("algorithm %q is not allowed in FIPS mode", a)
+			}
+			// ========================================
 			algorithms = append(algorithms, algorithm)
 		}
 	}
