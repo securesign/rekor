@@ -265,6 +265,7 @@ for i in $(seq 13 20) ; do
     echo test${i} > $testdir/blob${i}
     minisign -S -s $testdir/mini${i}.key -m $testdir/blob${i}
     rekor_out=$(rekor-cli --rekor_server $REKOR_ADDRESS upload \
+        --type=rekord \
         --artifact $testdir/blob${i} \
         --pki-format=minisign \
         --public-key $testdir/mini${i}.pub \
