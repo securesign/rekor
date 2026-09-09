@@ -91,7 +91,7 @@ func (s Signature) CanonicalValue() ([]byte, error) {
 // Verify implements the pki.Signature interface
 func (s Signature) Verify(_ io.Reader, k interface{}, _ ...sigsig.VerifyOption) error {
 	key, ok := k.(*PublicKey)
-	if !ok {
+	if !ok || key == nil {
 		return fmt.Errorf("invalid public key type for: %v", k)
 	}
 
@@ -158,6 +158,9 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 		}
 	}
 	for name, role := range root.Roles {
+		if role == nil {
+			return nil, errors.New("tuf root contains nil role")
+		}
 		if err := db.AddRole(name, role); err != nil {
 			return nil, err
 		}
@@ -184,6 +187,9 @@ func (k PublicKey) CanonicalValue() (encoded []byte, err error) {
 }
 
 func (k PublicKey) SpecVersion() (string, error) {
+	if k.root == nil {
+		return "", errors.New("tuf root has not been initialized")
+	}
 	// extract role
 	sm := &signedMeta{}
 	if err := json.Unmarshal(k.root.Signed, sm); err != nil {
@@ -204,6 +210,9 @@ func (k PublicKey) Subjects() []string {
 
 // Identities implements the pki.PublicKey interface
 func (k PublicKey) Identities() ([]identity.Identity, error) {
+	if k.root == nil {
+		return nil, errors.New("tuf root has not been initialized")
+	}
 	root := &data.Root{}
 	if err := json.Unmarshal(k.root.Signed, root); err != nil {
 		return nil, err

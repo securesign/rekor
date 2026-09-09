@@ -83,11 +83,9 @@ import (
 const (
 	mysqlWriteStmt       = "INSERT IGNORE INTO EntryIndex (EntryKey, EntryUUID) VALUES (:key, :uuid)"
 	mysqlCreateTableStmt = `CREATE TABLE IF NOT EXISTS EntryIndex (
-		PK BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-		EntryKey varchar(512) NOT NULL,
-		EntryUUID char(80) NOT NULL,
-		PRIMARY KEY(PK),
-		UNIQUE(EntryKey, EntryUUID)
+		EntryKey varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+		EntryUUID char(80) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+		PRIMARY KEY(EntryKey, EntryUUID)
 	)`
 	mysqlCheckpointTableStmt = `CREATE TABLE IF NOT EXISTS BackfillCheckpoint (
 		CheckpointKey VARCHAR(255) NOT NULL,
@@ -378,9 +376,9 @@ func populate(indexClient indexClient, rekorClient *rekorclient.Rekor) (err erro
 	for i := *startIndex; i <= *endIndex; i++ {
 		index := i // capture loop variable for closure
 		group.Go(func() error {
-			params := entries.NewGetLogEntryByIndexParamsWithContext(ctx)
+			params := entries.NewGetLogEntryByIndexParams()
 			params.SetLogIndex(int64(index))
-			resp, err := rekorClient.Entries.GetLogEntryByIndex(params)
+			resp, err := rekorClient.Entries.GetLogEntryByIndexContext(ctx, params)
 			if err != nil {
 				// in case of sigterm, just return to exit gracefully
 				if errors.Is(err, context.Canceled) {

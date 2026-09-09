@@ -31,6 +31,7 @@ RUN go mod download
 
 # Add source code
 ADD ./cmd/ $APP_ROOT/src/cmd/
+ADD ./internal/ $APP_ROOT/src/internal/
 ADD ./pkg/ $APP_ROOT/src/pkg/
 
 ARG SERVER_LDFLAGS

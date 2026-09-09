@@ -146,7 +146,7 @@ run_backfill() {
             --concurrency 5 --start 0 --end $end_index
     else
         go run cmd/backfill-index/main.go --rekor-address $REKOR_ADDRESS \
-            --mysql-dsn "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST}:${MYSQL_PORT})/${MYSQL_DB}" \
+            --mysql-dsn "${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST}:${MYSQL_PORT})/${MYSQL_DB}?parseTime=true&interpolateParams=true" \
             --concurrency 5 --start 0 --end $end_index
     fi
     set +e
@@ -265,6 +265,7 @@ for i in $(seq 13 20) ; do
     echo test${i} > $testdir/blob${i}
     minisign -S -s $testdir/mini${i}.key -m $testdir/blob${i}
     rekor_out=$(rekor-cli --rekor_server $REKOR_ADDRESS upload \
+        --type=rekord \
         --artifact $testdir/blob${i} \
         --pki-format=minisign \
         --public-key $testdir/mini${i}.pub \
