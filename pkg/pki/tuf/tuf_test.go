@@ -26,8 +26,8 @@ import (
 	"time"
 
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
-	_ "github.com/theupdateframework/go-tuf/pkg/deprecated/set_ecdsa"
-	"github.com/theupdateframework/go-tuf/verify"
+	_ "github.com/theupdateframework/go-tuf/v2/pkg/deprecated/set_ecdsa"
+	"github.com/theupdateframework/go-tuf/v2/verify"
 )
 
 func patchIsExpired() func() {
