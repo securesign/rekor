@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	tinkUtils "github.com/sigstore/sigstore/pkg/signature/tink"
-	"github.com/tink-crypto/tink-go-awskms/v2/integration/awskms"
+	"github.com/tink-crypto/tink-go-awskms/v3/integration/awskms"
 	"github.com/tink-crypto/tink-go-gcpkms/v2/integration/gcpkms"
 	"github.com/tink-crypto/tink-go/v2/core/registry"
 	"github.com/tink-crypto/tink-go/v2/keyset"
