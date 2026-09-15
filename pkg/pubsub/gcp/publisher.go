@@ -28,7 +28,7 @@ import (
 	sigpubsub "github.com/sigstore/rekor/pkg/pubsub"
 
 	"cloud.google.com/go/iam/apiv1/iampb"
-	"cloud.google.com/go/pubsub/v2"
+	"cloud.google.com/go/pubsub/v2/v2"
 	"google.golang.org/api/option"
 )
 
