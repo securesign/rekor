@@ -50,7 +50,7 @@ func TestPublishCheckpoint(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123, Revision: 0}
+	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123}
 	mRoot, err := root.MarshalBinary()
 	if err != nil {
 		t.Fatalf("error marshalling log root: %v", err)
@@ -105,7 +105,7 @@ func TestPublishCheckpointMultiple(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123, Revision: 0}
+	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123}
 	mRoot, err := root.MarshalBinary()
 	if err != nil {
 		t.Fatalf("error marshalling log root: %v", err)
@@ -243,7 +243,7 @@ func TestPublishCheckpointRedisFailure(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123, Revision: 0}
+	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123}
 	mRoot, err := root.MarshalBinary()
 	if err != nil {
 		t.Fatalf("error marshalling log root: %v", err)
@@ -287,7 +287,7 @@ func TestPublishCheckpointRedisLatestFailure(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123, Revision: 0}
+	root := &types.LogRootV1{TreeSize: 10, RootHash: []byte{1}, TimestampNanos: 123}
 	mRoot, err := root.MarshalBinary()
 	if err != nil {
 		t.Fatalf("error marshalling log root: %v", err)
