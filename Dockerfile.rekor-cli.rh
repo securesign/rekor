@@ -26,7 +26,7 @@ RUN git update-index --assume-unchanged Dockerfile.rekor-cli.rh && \
     git update-index --no-assume-unchanged Dockerfile.rekor-cli.rh
 
 #Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:f5984079c023c18ed877db08f82bf2069742dc2de1e48d1368f6a46836963f75
 
 LABEL description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
 LABEL io.k8s.description="Rekor-cli is a command line interface (CLI) tool used to interact with a rekor server."
