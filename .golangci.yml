@@ -46,7 +46,7 @@ linters:
       - linters:
           - staticcheck
         # Deprecated in_toto types, will be addressed in future PR
-        text: 'SA1019: in_toto\.(Statement|StatementHeader|Subject) is deprecated'
+        text: 'SA1019: .*in_toto\.(Statement|StatementHeader|Subject) is deprecated'
       - linters:
           - gosec
         text: 'G115: '
