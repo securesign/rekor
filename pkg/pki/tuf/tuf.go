@@ -33,9 +33,9 @@ import (
 	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
-	"github.com/theupdateframework/go-tuf/data"
-	"github.com/theupdateframework/go-tuf/pkg/keys"
-	"github.com/theupdateframework/go-tuf/verify"
+	"github.com/theupdateframework/go-tuf/v2/data"
+	"github.com/theupdateframework/go-tuf/v2/pkg/keys"
+	"github.com/theupdateframework/go-tuf/v2/verify"
 )
 
 type Signature struct {
