@@ -19,7 +19,26 @@ on:
   push:
     branches:
       - main
+      - 'release-**'
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
   pull_request:
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
 
 permissions:
   contents: read
