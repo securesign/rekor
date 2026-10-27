@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1792425967@sha256:68d6b72cc3eb4c7975b2aca2451f6601c048c095d6b5fc2a310ce3df5ef2ada6 AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1792906297@sha256:c51f0f31cbaa7e91dede6013f636d54fe10dd7d581cfc4cda014ba9d62bcd779 AS build-env
 USER root
 
 RUN mkdir -p /opt/app-root && mkdir -p /opt/app-root/src && mkdir -p /opt/app-root/src/cmd && mkdir -p /opt/app-root/src/pkg && git config --global --add safe.directory /opt/app-root/src
@@ -65,7 +65,7 @@ RUN mkdir -p /var/run/attestations && \
 COPY --from=build-env /opt/app-root/src/rekor-server_test /usr/local/bin/rekor-server
 
 # Multi-Stage production build
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:c4c285d42941ebb2bd4da878479008e1e4536bb599aad1dbe568f89de9053661 as deploy
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:6f3a78179e0b30b930a186e7f68a4af52e51bb82406c9653be10bddd624e40f5 as deploy
 
 LABEL description="Rekor aims to provide an immutable, tamper-resistant ledger of metadata generated within a software project’s supply chain."
 LABEL io.k8s.description="Rekor-Server provides a tamper resistant ledger."
