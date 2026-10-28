@@ -28,6 +28,7 @@ on:
       - '*.md'
       - 'LICENSE'
       - 'release/**'
+      - 'renovate.json'
   pull_request:
     paths-ignore:
       - 'Dockerfile.backfill-redis.rh'
@@ -38,6 +39,7 @@ on:
       - '*.md'
       - 'LICENSE'
       - 'release/**'
+      - 'renovate.json'
 
 permissions:
   contents: read
