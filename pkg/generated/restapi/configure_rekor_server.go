@@ -22,6 +22,7 @@ import (
 	"crypto/tls"
 	go_errors "errors"
 	"fmt"
+	"github.com/miyunari/sigstore-observability-instrumentation/tracing"
 	"io"
 	"net"
 	"net/http"
@@ -39,7 +40,6 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/rs/cors"
 	"github.com/spf13/viper"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -281,7 +281,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 		returnHandler.ServeHTTP(w, r)
 	}))
-	return otelhttp.NewHandler(requestIDHandler, "rekor-server")
+	return tracing.NewHandler(requestIDHandler, "rekor-server")
 }
 
 // Populates the the apiToRecord for this method/path so metrics are emitted.

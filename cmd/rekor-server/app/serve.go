@@ -28,8 +28,8 @@ import (
 	"cloud.google.com/go/profiler"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-openapi/loads"
+	"github.com/miyunari/sigstore-observability-instrumentation/tracing"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sigstore/model-validation-operator/pkg/tracing"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"sigs.k8s.io/release-utils/version"
@@ -75,27 +75,16 @@ var serveCmd = &cobra.Command{
 
 		StartPprof()
 
-		if viper.GetBool("tracing.enabled") {
-			opts := []tracing.Option{
-				tracing.WithServiceName("rekor-server"),
-				tracing.WithInsecure(viper.GetBool("tracing.insecure")),
-			}
-			if ep := viper.GetString("tracing.endpoint"); ep != "" {
-				opts = append(opts, tracing.WithEndpoint(ep))
-			}
-			if viper.GetBool("tracing.stdout") {
-				opts = append(opts, tracing.WithStdoutExporter())
-			}
-			shutdownTracing, err := tracing.SetupTracing(context.Background(), opts...)
-			if err != nil {
-				log.Logger.Fatalf("failed to initialize tracing: %v", err)
-			}
-			defer func() {
-				if err := shutdownTracing(context.Background()); err != nil {
-					log.Logger.Errorf("error shutting down tracing: %v", err)
-				}
-			}()
+		shutdownTracing, err := tracing.Setup(context.Background(), tracing.ConfigFromGetter(viper.GetViper()),
+			tracing.WithServiceName("rekor-server"), tracing.WithServiceVersion(version.GetVersionInfo().GitVersion))
+		if err != nil {
+			log.Logger.Fatalf("failed to initialize tracing: %v", err)
 		}
+		defer func() {
+			if err := shutdownTracing(context.Background()); err != nil {
+				log.Logger.Errorf("error shutting down tracing: %v", err)
+			}
+		}()
 
 		// workaround for https://github.com/sigstore/rekor/issues/68
 		// from https://github.com/golang/glog/commit/fca8c8854093a154ff1eb580aae10276ad6b1b5f
