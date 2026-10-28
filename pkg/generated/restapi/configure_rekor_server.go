@@ -42,6 +42,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/sigstore/rekor/internal/tlspolicy"
 	pkgapi "github.com/sigstore/rekor/pkg/api"
 	"github.com/sigstore/rekor/pkg/generated/restapi/operations"
 	"github.com/sigstore/rekor/pkg/generated/restapi/operations/entries"
@@ -167,8 +168,8 @@ func configureAPI(api *operations.RekorServerAPI) http.Handler {
 }
 
 // The TLS configuration before HTTPS server starts.
-func configureTLS(_ *tls.Config) {
-	// Make all necessary changes to the TLS configuration here.
+func configureTLS(cfg *tls.Config) {
+	tlspolicy.Apply(cfg)
 }
 
 // As soon as server is initialized but not run yet, this function will be called.
@@ -214,8 +215,8 @@ type zapLogEntry struct {
 	r *http.Request
 }
 
-func (z *zapLogEntry) Write(status, bytes int, _ http.Header, elapsed time.Duration, extra interface{}) {
-	var fields []interface{}
+func (z *zapLogEntry) Write(status, bytes int, _ http.Header, elapsed time.Duration, extra any) {
+	var fields []any
 
 	// follows https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry as a convention
 	// append HTTP Request / Response Information
@@ -242,8 +243,8 @@ func (z *zapLogEntry) Write(status, bytes int, _ http.Header, elapsed time.Durat
 	log.ContextLogger(z.r.Context()).With(fields...).Info("completed request")
 }
 
-func (z *zapLogEntry) Panic(v interface{}, stack []byte) {
-	fields := []interface{}{zap.String("message", fmt.Sprintf("%v\n%v", v, string(stack)))}
+func (z *zapLogEntry) Panic(v any, stack []byte) {
+	fields := []any{zap.String("message", fmt.Sprintf("%v\n%v", v, string(stack)))}
 	log.ContextLogger(z.r.Context()).With(fields...).Errorf("panic detected: %v", v)
 }
 
@@ -359,12 +360,15 @@ func logAndServeError(w http.ResponseWriter, r *http.Request, err error) {
 		for _, embeddedErr := range compErr.Errors {
 			var maxBytesError *http.MaxBytesError
 			if parseErr, ok := embeddedErr.(*errors.ParseError); ok && go_errors.As(parseErr.Reason, &maxBytesError) {
-				err = errors.New(http.StatusRequestEntityTooLarge, "Request Entity Too Large")
+				err = errors.New(http.StatusRequestEntityTooLarge, "Request Entity Too Large. Limit set to %v", maxBytesError.Limit)
+				break
+			} else if go_errors.As(embeddedErr, &maxBytesError) {
+				err = errors.New(http.StatusRequestEntityTooLarge, "Request Entity Too Large. Limit set to %v", maxBytesError.Limit)
 				break
 			}
 		}
 	}
-	requestFields := map[string]interface{}{}
+	requestFields := map[string]any{}
 	if decodeErr := mapstructure.Decode(r, &requestFields); decodeErr == nil {
 		log.ContextLogger(ctx).Debug(requestFields)
 	}
@@ -391,7 +395,7 @@ func recoverer(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if rvr := recover(); rvr != nil && rvr != http.ErrAbortHandler {
-				var fields []interface{}
+				var fields []any
 
 				// get context before dump request in case there is an error
 				ctx := r.Context()

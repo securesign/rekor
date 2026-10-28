@@ -272,7 +272,7 @@ func (v *V001Entry) fetchExternalEntities(_ context.Context) (*pkcs7.PublicKey, 
 	if oldSHA == "" {
 		v.JARModel.Archive.Hash = &models.JarV001SchemaArchiveHash{
 			Algorithm: conv.Pointer(models.JarV001SchemaArchiveHashAlgorithmSha256),
-			Value:     conv.Pointer(computedSHA),
+			Value:     new(computedSHA),
 		}
 
 	}
@@ -314,9 +314,9 @@ func (v *V001Entry) Canonicalize(ctx context.Context) ([]byte, error) {
 
 	v.JARModel = canonicalEntry
 	// wrap in valid object with kind and apiVersion set
-	jar := models.Jar{}
-	jar.APIVersion = conv.Pointer(APIVERSION)
-	jar.Spec = &canonicalEntry
+	jar := models.Jar{
+		APIVersion: new(APIVERSION),
+		Spec:       &canonicalEntry}
 
 	return json.Marshal(&jar)
 }
@@ -381,10 +381,10 @@ func extractPKCS7SignatureFromJAR(inz *zip.Reader) ([]byte, error) {
 
 func (v *V001Entry) CreateFromArtifactProperties(ctx context.Context, props types.ArtifactProperties) (models.ProposedEntry, error) {
 	returnVal := models.Jar{}
-	re := V001Entry{}
+	re := V001Entry{
 
-	// we will need only the artifact; public-key & signature are embedded in JAR
-	re.JARModel = models.JarV001Schema{}
+		// we will need only the artifact; public-key & signature are embedded in JAR
+		JARModel: models.JarV001Schema{}}
 	re.JARModel.Archive = &models.JarV001SchemaArchive{}
 
 	var err error
@@ -421,7 +421,7 @@ func (v *V001Entry) CreateFromArtifactProperties(ctx context.Context, props type
 		return nil, fmt.Errorf("error retrieving external entities: %w", err)
 	}
 
-	returnVal.APIVersion = conv.Pointer(re.APIVersion())
+	returnVal.APIVersion = new(re.APIVersion())
 	returnVal.Spec = re.JARModel
 
 	return &returnVal, nil

@@ -126,7 +126,6 @@ var benchmarkUnmarshalEntrySink *V001Entry
 
 func BenchmarkV001EntryUnmarshal(b *testing.B) {
 	for _, payloadSize := range []int{256 * 1024, 1024 * 1024, 32 * 1024 * 1024} {
-		payloadSize := payloadSize
 		b.Run(strconv.Itoa(payloadSize)+"B", func(b *testing.B) {
 			pe := benchmarkProposedEntry(b, payloadSize)
 
@@ -198,7 +197,7 @@ func benchmarkProposedEntry(tb testing.TB, payloadSize int) models.ProposedEntry
 
 	env := benchmarkEnvelope(tb, key, payload)
 	return &models.DSSE{
-		APIVersion: conv.Pointer(APIVERSION),
+		APIVersion: new(APIVERSION),
 		Spec: &models.DSSEV001Schema{
 			ProposedContent: createRekorEnvelope(env, [][]byte{pub}),
 		},
@@ -297,6 +296,19 @@ func benchmarkUnmarshalBefore(v *V001Entry, pe models.ProposedEntry) error {
 		})
 	}
 
+	// old index key extraction struct defs pre #2946
+	type indexKeyExtract struct {
+		Subject []struct {
+			Digest map[string]string `json:"digest"`
+		} `json:"subject"`
+		Predicate json.RawMessage `json:"predicate"`
+	}
+	type materialsExtract struct {
+		Materials []struct {
+			Digest map[string]string `json:"digest"`
+		} `json:"materials"`
+	}
+
 	if env.PayloadType == in_toto.PayloadType {
 		var extract indexKeyExtract
 		if err := json.Unmarshal(decodedPayload, &extract); err == nil {
@@ -321,13 +333,13 @@ func benchmarkUnmarshalBefore(v *V001Entry, pe models.ProposedEntry) error {
 	payloadHash := sha256.Sum256(decodedPayload)
 	dsseObj.PayloadHash = &models.DSSEV001SchemaPayloadHash{
 		Algorithm: conv.Pointer(models.DSSEV001SchemaPayloadHashAlgorithmSha256),
-		Value:     conv.Pointer(fmt.Sprintf("%x", payloadHash[:])),
+		Value:     new(fmt.Sprintf("%x", payloadHash[:])),
 	}
 
 	envelopeHash := sha256.Sum256([]byte(*dsseObj.ProposedContent.Envelope))
 	dsseObj.EnvelopeHash = &models.DSSEV001SchemaEnvelopeHash{
 		Algorithm: conv.Pointer(models.DSSEV001SchemaEnvelopeHashAlgorithmSha256),
-		Value:     conv.Pointer(fmt.Sprintf("%x", envelopeHash[:])),
+		Value:     new(fmt.Sprintf("%x", envelopeHash[:])),
 	}
 
 	v.DSSEObj = *dsseObj

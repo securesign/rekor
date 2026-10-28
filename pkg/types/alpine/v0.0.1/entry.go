@@ -237,7 +237,7 @@ func (v *V001Entry) fetchExternalEntities(_ context.Context) (*x509.PublicKey, *
 	if oldSHA == "" {
 		v.AlpineModel.Package.Hash = &models.AlpineV001SchemaPackageHash{}
 		v.AlpineModel.Package.Hash.Algorithm = conv.Pointer(models.AlpineV001SchemaPackageHashAlgorithmSha256)
-		v.AlpineModel.Package.Hash.Value = conv.Pointer(computedSHA)
+		v.AlpineModel.Package.Hash.Value = new(computedSHA)
 	}
 
 	return keyObj, &apk, nil
@@ -270,9 +270,9 @@ func (v *V001Entry) Canonicalize(ctx context.Context) ([]byte, error) {
 	canonicalEntry.Package.Pkginfo = apkObj.Pkginfo
 
 	// wrap in valid object with kind and apiVersion set
-	apk := models.Alpine{}
-	apk.APIVersion = conv.Pointer(APIVERSION)
-	apk.Spec = &canonicalEntry
+	apk := models.Alpine{
+		APIVersion: new(APIVERSION),
+		Spec:       &canonicalEntry}
 
 	v.AlpineModel = canonicalEntry
 
@@ -312,10 +312,10 @@ func (v V001Entry) validate() error {
 
 func (v V001Entry) CreateFromArtifactProperties(ctx context.Context, props types.ArtifactProperties) (models.ProposedEntry, error) {
 	returnVal := models.Alpine{}
-	re := V001Entry{}
+	re := V001Entry{
 
-	// we will need artifact, public-key, signature
-	re.AlpineModel = models.AlpineV001Schema{}
+		// we will need artifact, public-key, signature
+		AlpineModel: models.AlpineV001Schema{}}
 	re.AlpineModel.Package = &models.AlpineV001SchemaPackage{}
 
 	var err error
@@ -371,7 +371,7 @@ func (v V001Entry) CreateFromArtifactProperties(ctx context.Context, props types
 		return nil, fmt.Errorf("error retrieving external entities: %w", err)
 	}
 
-	returnVal.APIVersion = conv.Pointer(re.APIVersion())
+	returnVal.APIVersion = new(re.APIVersion())
 	returnVal.Spec = re.AlpineModel
 
 	return &returnVal, nil

@@ -28,10 +28,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/cyberphone/json-canonicalization/go/src/webpki.org/jsoncanonicalizer"
 	"github.com/sigstore/rekor/pkg/pki/identity"
 	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
-	"github.com/sigstore/sigstore/pkg/cryptoutils"
+	"github.com/sigstore/rekor/pkg/util/jcs"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
 	"github.com/theupdateframework/go-tuf/data"
 	"github.com/theupdateframework/go-tuf/pkg/keys"
@@ -85,11 +84,11 @@ func (s Signature) CanonicalValue() ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("marshalling signature: %w", err)
 	}
-	return jsoncanonicalizer.Transform(marshalledBytes)
+	return jcs.Canonicalize(marshalledBytes)
 }
 
 // Verify implements the pki.Signature interface
-func (s Signature) Verify(_ io.Reader, k interface{}, _ ...sigsig.VerifyOption) error {
+func (s Signature) Verify(_ io.Reader, k any, _ ...sigsig.VerifyOption) error {
 	key, ok := k.(*PublicKey)
 	if !ok || key == nil {
 		return fmt.Errorf("invalid public key type for: %v", k)
@@ -183,7 +182,7 @@ func (k PublicKey) CanonicalValue() (encoded []byte, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("marshalling tuf root: %w", err)
 	}
-	return jsoncanonicalizer.Transform(marshalledBytes)
+	return jcs.Canonicalize(marshalledBytes)
 }
 
 func (k PublicKey) SpecVersion() (string, error) {
@@ -236,7 +235,7 @@ func (k PublicKey) Identities() ([]identity.Identity, error) {
 			if err != nil {
 				return nil, err
 			}
-			pkixKey, err := cryptoutils.MarshalPublicKeyToDER(pub)
+			pkixKey, err := x509.MarshalPKIXPublicKey(pub)
 			if err != nil {
 				return nil, err
 			}
@@ -249,7 +248,7 @@ func (k PublicKey) Identities() ([]identity.Identity, error) {
 		case data.KeyTypeEd25519:
 			// key is stored as a 32-byte string
 			pub := ed25519.PublicKey(verifier.Public())
-			pkixKey, err := cryptoutils.MarshalPublicKeyToDER(pub)
+			pkixKey, err := x509.MarshalPKIXPublicKey(pub)
 			if err != nil {
 				return nil, err
 			}
