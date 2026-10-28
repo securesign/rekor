@@ -23,6 +23,16 @@ on:
       - 'release-**'
     tags:
       - '*'
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
+      - 'renovate.json'
 
 permissions:
   contents: read
@@ -30,6 +40,8 @@ permissions:
 jobs:
   build:
     name: build
+    # RHTAS - Skipping due to auth with google
+    if: github.repository == 'sigstore/rekor'
     runs-on: ubuntu-latest
 
     permissions:

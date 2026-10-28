@@ -17,6 +17,7 @@ package alpine
 
 import (
 	"context"
+	"crypto/fips140"
 	"errors"
 	"fmt"
 
@@ -33,6 +34,12 @@ type BaseAlpineType struct {
 }
 
 func init() {
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	if fips140.Enabled() {
+		return
+	}
+	// ========================================
 	types.TypeMap.Store(KIND, New)
 }
 

@@ -19,7 +19,28 @@ on:
   push:
     branches:
       - main
+      - 'release-**'
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
+      - 'renovate.json'
   pull_request:
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
+      - 'renovate.json'
 
 permissions:
   contents: read
@@ -46,7 +67,7 @@ jobs:
       - name: Check license headers
         run: |
           set -e
-          addlicense -l apache -c 'The Sigstore Authors' -v -ignore '**/testdata/**' -ignore 'internal/pgpv3/upstream/**' -ignore 'internal/pgpv3/adapted/signature.go' *
+          addlicense -l apache -c 'The Sigstore Authors' -v -ignore '**/testdata/**' -ignore 'internal/pgpv3/upstream/**' -ignore 'internal/pgpv3/adapted/signature.go' -ignore 'policy-data/**' *
           git diff --exit-code
 
   golangci:

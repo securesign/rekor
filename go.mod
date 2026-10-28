@@ -32,7 +32,7 @@ require (
 	github.com/google/trillian v1.8.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.4
 	github.com/in-toto/in-toto-golang v0.11.0
-	github.com/jedisct1/go-minisign v0.0.0-20211028175153-1c139d1cc84b
+	github.com/jedisct1/go-minisign v0.0.0-20241212093149-d2f9f49435c7
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/redis/go-redis/v9 v9.22.0
@@ -74,7 +74,6 @@ require (
 )
 
 require (
-	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	cel.dev/expr v0.25.2 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.24.1-0.20261001053825-dbc26066f70a // indirect
@@ -122,7 +121,7 @@ require (
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
-	github.com/danieljoos/wincred v1.2.2 // indirect
+	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.37.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.3.3 // indirect
@@ -142,7 +141,7 @@ require (
 	github.com/go-openapi/swag/pools v0.29.2 // indirect
 	github.com/go-openapi/swag/stringutils v0.29.2 // indirect
 	github.com/go-openapi/swag/yamlutils v0.29.1 // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/google/go-containerregistry v0.22.1 // indirect
 	github.com/google/pprof v0.0.0-20260604005048-7023385849c0 // indirect
@@ -168,7 +167,7 @@ require (
 	github.com/klauspost/compress v1.19.2 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.24 // indirect
+	github.com/mattn/go-sqlite3 v1.14.38 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -178,14 +177,13 @@ require (
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
+	github.com/planetscale/vtprotobuf v0.6.1-0.20250313105119-ba97887b0a25 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
 	github.com/prometheus/common v0.70.1 // indirect
 	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
-	github.com/sagikazarmark/locafero v0.11.0 // indirect
+	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
-	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.8.1 // indirect
@@ -194,7 +192,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
-	github.com/zalando/go-keyring v0.2.6 // indirect
+	github.com/zalando/go-keyring v0.2.8 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.44.0 // indirect
@@ -219,5 +217,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
-	software.sslmate.com/src/go-pkcs12 v0.5.0 // indirect
+	software.sslmate.com/src/go-pkcs12 v0.7.0 // indirect
 )

@@ -16,7 +16,9 @@
 package tuf
 
 import (
+	"crypto"
 	"crypto/ed25519"
+	"crypto/fips140"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/hex"
@@ -27,6 +29,7 @@ import (
 	"time"
 
 	"github.com/sigstore/rekor/pkg/pki/identity"
+	pkitypes "github.com/sigstore/rekor/pkg/pki/pkitypes"
 	"github.com/sigstore/rekor/pkg/util/jcs"
 	sigsig "github.com/sigstore/sigstore/pkg/signature"
 	"github.com/theupdateframework/go-tuf/data"
@@ -125,9 +128,30 @@ func NewPublicKey(r io.Reader) (*PublicKey, error) {
 	// Now create a verification db that trusts all the keys
 	db := verify.NewDB()
 	for id, k := range root.Keys {
-		if k == nil {
-			return nil, errors.New("tuf root contains nil key")
+		// RHTAS FIPS - DO NOT REMOVE
+		// ========================================
+		if fips140.Enabled() {
+			verifier, err := keys.GetVerifier(k)
+			if err != nil {
+				return nil, err
+			}
+			var pub crypto.PublicKey
+			switch k.Type {
+			case data.KeyTypeRSASSA_PSS_SHA256, "ecdsa-sha2-nistp256", "ecdsa":
+				pub, err = x509.ParsePKIXPublicKey([]byte(verifier.Public()))
+				if err != nil {
+					return nil, err
+				}
+			case data.KeyTypeEd25519:
+				pub = ed25519.PublicKey(verifier.Public())
+			}
+			if pub != nil {
+				if err := pkitypes.ValidatePublicKey(pub); err != nil {
+					return nil, err
+				}
+			}
 		}
+		// ========================================
 		if err := db.AddKey(id, k); err != nil {
 			return nil, err
 		}

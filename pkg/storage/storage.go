@@ -17,6 +17,7 @@ package storage
 
 import (
 	"context"
+	"crypto/fips140"
 	"errors"
 	"fmt"
 
@@ -57,29 +58,51 @@ type Blob struct {
 
 func (b *Blob) StoreAttestation(ctx context.Context, key string, attestation []byte) error {
 	log.ContextLogger(ctx).Infof("storing attestation at %s", key)
-	w, err := b.bucket.NewWriter(ctx, key, nil)
-	if err != nil {
-		return err
-	}
-	if _, err := w.Write(attestation); err != nil {
-		return err
-	}
-	return w.Close()
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	// gocloud.dev/blob/fileblob computes MD5 for sidecar metadata on every write.
+	// MD5 is not used for integrity or authentication here — it is a non-cryptographic
+	// content identifier. WithoutEnforcement prevents a panic under fips140=only
+	// without weakening any cryptographic operation.
+	var writeErr error
+	fips140.WithoutEnforcement(func() {
+		w, err := b.bucket.NewWriter(ctx, key, nil)
+		if err != nil {
+			writeErr = err
+			return
+		}
+		if _, err := w.Write(attestation); err != nil {
+			_ = w.Close()
+			writeErr = err
+			return
+		}
+		writeErr = w.Close()
+	})
+	return writeErr
+	// ========================================
 }
 
 func (b *Blob) FetchAttestation(ctx context.Context, key string) ([]byte, error) {
 	log.ContextLogger(ctx).Infof("fetching attestation %s", key)
-	exists, err := b.bucket.Exists(ctx, key)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, fmt.Errorf("attestation %v does not exist", key)
-	}
-
-	data, err := b.bucket.ReadAll(ctx, key)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	// RHTAS FIPS - DO NOT REMOVE
+	// ========================================
+	// gocloud.dev/blob/fileblob may use MD5 when reading blob attributes.
+	// MD5 here is a non-cryptographic content identifier, not used for
+	// integrity or authentication. Same rationale as StoreAttestation.
+	var data []byte
+	var fetchErr error
+	fips140.WithoutEnforcement(func() {
+		exists, err := b.bucket.Exists(ctx, key)
+		if err != nil {
+			fetchErr = err
+			return
+		}
+		if !exists {
+			fetchErr = fmt.Errorf("attestation %v does not exist", key)
+			return
+		}
+		data, fetchErr = b.bucket.ReadAll(ctx, key)
+	})
+	return data, fetchErr
+	// ========================================
 }

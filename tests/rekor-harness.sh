@@ -123,6 +123,10 @@ do
         echo "Tests passed successfully."
         echo "======================================================="
     done
+
+    # Clean up docker resources between server versions to free disk space
+    echo "Cleaning up docker resources..."
+    docker system prune -f --volumes
 done
 
 # Since we add two entries to the log for every test, once all tests are run we should have 2*(($NUM_VERSIONS_TO_TEST+1)^2) entries
