@@ -5,7 +5,7 @@
   ],
   "enabledManagers": ["dockerfile", "gomod", "tekton", "custom.regex"],
   "ignorePaths": [
-    "Dockerfile",
+    "Dockerfile{,}",
     "Dockerfile.pubsub-emulator",
     "Dockerfile.trillian-log-server",
     "Dockerfile.trillian-log-signer",

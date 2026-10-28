@@ -29,6 +29,7 @@ on:
       - '*.md'
       - 'LICENSE'
       - 'release/**'
+      - 'renovate.json'
   pull_request:
     paths-ignore:
       - 'Dockerfile.backfill-redis.rh'
@@ -39,6 +40,7 @@ on:
       - '*.md'
       - 'LICENSE'
       - 'release/**'
+      - 'renovate.json'
   schedule:
     - cron: '45 10 * * 1'
 
