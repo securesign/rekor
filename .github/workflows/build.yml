@@ -32,6 +32,7 @@ on:
       - '*.md'
       - 'LICENSE'
       - 'release/**'
+      - 'renovate.json'
 
 permissions:
   contents: read
