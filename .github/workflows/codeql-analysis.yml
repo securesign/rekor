@@ -20,10 +20,27 @@ on:
     branches:
       - main
       - 'release-**'
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
+      - 'renovate.json'
   pull_request:
-    branches:
-      - main
-      - 'release-**'
+    paths-ignore:
+      - 'Dockerfile.backfill-redis.rh'
+      - 'Dockerfile.cli-stack.rh'
+      - 'Dockerfile.rekor-cli.rh'
+      - 'Dockerfile.rekor-server.rh'
+      - '.tekton/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'release/**'
+      - 'renovate.json'
   schedule:
     - cron: '45 10 * * 1'
 
