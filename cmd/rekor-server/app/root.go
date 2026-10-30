@@ -17,7 +17,6 @@ package app
 
 import (
 	"fmt"
-	"github.com/securesign/sigstore-observability-instrumentation/tracing"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -26,6 +25,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/securesign/sigstore-observability-instrumentation/tracing"
 	"github.com/sigstore/rekor/internal/config"
 	"github.com/sigstore/rekor/pkg/api"
 	"github.com/sigstore/rekor/pkg/log"
