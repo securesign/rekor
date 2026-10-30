@@ -63,8 +63,8 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/miyunari/sigstore-observability-instrumentation/tracing v0.0.0-20261028093507-1679b92c3602
 	github.com/redis/go-redis/v9 v9.22.0
+	github.com/securesign/sigstore-observability-instrumentation/tracing v0.0.0-20261030133317-6b2d08ea1ae8
 	github.com/sigstore/protobuf-specs v0.5.1
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.9
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.9

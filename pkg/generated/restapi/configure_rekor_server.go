@@ -22,7 +22,7 @@ import (
 	"crypto/tls"
 	go_errors "errors"
 	"fmt"
-	"github.com/miyunari/sigstore-observability-instrumentation/tracing"
+	"github.com/securesign/sigstore-observability-instrumentation/tracing"
 	"io"
 	"net"
 	"net/http"

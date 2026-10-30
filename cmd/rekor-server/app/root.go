@@ -17,7 +17,7 @@ package app
 
 import (
 	"fmt"
-	"github.com/miyunari/sigstore-observability-instrumentation/tracing"
+	"github.com/securesign/sigstore-observability-instrumentation/tracing"
 	"net/http"
 	"net/http/pprof"
 	"os"
