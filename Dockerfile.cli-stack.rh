@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1792906297@sha256:c51f0f31cbaa7e91dede6013f636d54fe10dd7d581cfc4cda014ba9d62bcd779 AS build-cross-platform
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1793294290@sha256:cab9089469c52029e4d8a4e9f717e87c51ab22eed448ebcada101b811f97dfe7 AS build-cross-platform
 ENV APP_ROOT=/opt/app-root \
     GOPATH=/opt/app-root \
     GOFLAGS="-buildvcs=false"
@@ -23,7 +23,7 @@ FROM --platform=linux/arm64   quay.io/securesign/rekor-cli@sha256:11b01d265391dd
 FROM --platform=linux/ppc64le quay.io/securesign/rekor-cli@sha256:c54d365904bf7368ba2721ff2bbbdc6f1b5f539f62375a548f6fc4967becb99d AS build-ppc64le
 FROM --platform=linux/s390x   quay.io/securesign/rekor-cli@sha256:00611364a5a6edca33f8d7acb46c855b22b6a1104aa61c35e2997b2381cd0154 AS build-s390x
 
-FROM registry.redhat.io/ubi9/go-toolset:9.8-1792906297@sha256:c51f0f31cbaa7e91dede6013f636d54fe10dd7d581cfc4cda014ba9d62bcd779 AS packager
+FROM registry.redhat.io/ubi9/go-toolset:9.8-1793294290@sha256:cab9089469c52029e4d8a4e9f717e87c51ab22eed448ebcada101b811f97dfe7 AS packager
 USER root
 RUN mkdir -p /binaries
 
