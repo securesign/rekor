@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/securesign/sigstore-observability-instrumentation/tracing"
 	"github.com/sigstore/rekor/internal/config"
 	"github.com/sigstore/rekor/pkg/api"
 	"github.com/sigstore/rekor/pkg/log"
@@ -168,6 +169,9 @@ Memory and file-based signers should only be used for testing.`)
 
 	rootCmd.PersistentFlags().String("http-request-id-header-name", middleware.RequestIDHeader, "name of HTTP Request Header to use as request correlation ID")
 	rootCmd.PersistentFlags().String("trace-string-prefix", "", "if set, this will be used to prefix the 'trace' field when outputting structured logs")
+
+	tracingConfig := tracing.DefaultConfig()
+	tracingConfig.AddFlags(rootCmd.PersistentFlags())
 
 	keyAlgorithmTypes := []string{}
 	for _, keyAlgorithm := range api.AllowedClientSigningAlgorithms {

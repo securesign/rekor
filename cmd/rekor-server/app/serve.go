@@ -16,6 +16,7 @@
 package app
 
 import (
+	"context"
 	"crypto/fips140"
 	"flag"
 	"fmt"
@@ -28,6 +29,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-openapi/loads"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/securesign/sigstore-observability-instrumentation/tracing"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"sigs.k8s.io/release-utils/version"
@@ -72,6 +74,17 @@ var serveCmd = &cobra.Command{
 		log.ConfigureLogger(viper.GetString("log_type"), viper.GetString("trace-string-prefix"))
 
 		StartPprof()
+
+		shutdownTracing, err := tracing.Setup(context.Background(), tracing.ConfigFromGetter(viper.GetViper()),
+			tracing.WithServiceName("rekor-server"), tracing.WithServiceVersion(version.GetVersionInfo().GitVersion))
+		if err != nil {
+			log.Logger.Fatalf("failed to initialize tracing: %v", err)
+		}
+		defer func() {
+			if err := shutdownTracing(context.Background()); err != nil {
+				log.Logger.Errorf("error shutting down tracing: %v", err)
+			}
+		}()
 
 		// workaround for https://github.com/sigstore/rekor/issues/68
 		// from https://github.com/golang/glog/commit/fca8c8854093a154ff1eb580aae10276ad6b1b5f
