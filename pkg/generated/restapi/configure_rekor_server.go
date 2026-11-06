@@ -272,6 +272,8 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 	returnHandler = wrapMetrics(returnHandler)
 
+	// RHTAS Tracing - DO NOT REMOVE
+	// ========================================
 	requestIDHandler := middleware.RequestID(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		r = r.WithContext(log.WithRequestID(ctx, middleware.GetReqID(ctx)))
@@ -282,6 +284,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 		returnHandler.ServeHTTP(w, r)
 	}))
 	return tracing.NewHandler(requestIDHandler, "rekor-server")
+	// ========================================
 }
 
 // Populates the the apiToRecord for this method/path so metrics are emitted.
