@@ -50,7 +50,7 @@ require (
 	github.com/AdamKorcz/go-fuzz-headers-1 v0.0.0-20230919221257-8b5d3ce2d11d
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/cyberphone/json-canonicalization v0.0.0-20241213102144-19d51d7fe467
-	github.com/go-chi/chi/v5 v5.3.1
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/go-openapi/swag/cmdutils v0.26.1
 	github.com/go-openapi/swag/conv v0.28.0
 	github.com/go-openapi/swag/jsonutils v0.28.0
