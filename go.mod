@@ -4,75 +4,75 @@ go 1.26.3
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/go-openapi/errors v0.22.8
-	github.com/go-openapi/loads v0.25.1
-	github.com/go-openapi/runtime v0.32.5
-	github.com/go-openapi/spec v0.22.9
-	github.com/go-openapi/strfmt v0.27.0
-	github.com/go-openapi/validate v0.26.3
+	github.com/go-openapi/errors v0.22.9
+	github.com/go-openapi/loads v0.25.3
+	github.com/go-openapi/runtime v0.33.4
+	github.com/go-openapi/spec v1.0.1
+	github.com/go-openapi/strfmt v0.27.4
+	github.com/go-openapi/validate v1.0.1
 	github.com/google/go-cmp v0.7.0
 	github.com/google/rpmpack v0.7.1
-	github.com/google/trillian v1.7.3
+	github.com/google/trillian v1.8.0
 	github.com/in-toto/in-toto-golang v0.11.0
-	github.com/jedisct1/go-minisign v0.0.0-20241212093149-d2f9f49435c7
+	github.com/jedisct1/go-minisign v0.0.0-20260527172527-a09352b57a22
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prometheus/client_golang v1.24.1
+	github.com/prometheus/client_golang v1.25.0
 	github.com/rs/cors v1.11.1
-	github.com/secure-systems-lab/go-securesystemslib v0.11.0
-	github.com/sigstore/sigstore v1.10.9
+	github.com/secure-systems-lab/go-securesystemslib v0.11.1
+	github.com/sigstore/sigstore v1.11.3
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 	github.com/spf13/viper v1.21.0
-	github.com/theupdateframework/go-tuf v0.7.0
+	github.com/theupdateframework/go-tuf/v2 v2.4.2
 	github.com/transparency-dev/merkle v0.0.2
 	github.com/veraison/go-cose v1.3.0
 	github.com/zalando/go-keyring v0.2.8 // indirect
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap v1.28.0
-	gocloud.dev v0.46.0
+	gocloud.dev v0.47.0
 	golang.org/x/crypto v0.56.0
 	golang.org/x/mod v0.38.0
 	golang.org/x/net v0.58.0
-	golang.org/x/sync v0.22.0
+	golang.org/x/sync v0.25.0
 	google.golang.org/genproto v0.0.0-20260622175928-b703f567277d // indirect
-	google.golang.org/grpc v1.83.2
+	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/ini.v1 v1.67.3
-	sigs.k8s.io/release-utils v0.12.4
+	sigs.k8s.io/release-utils v0.12.5
 	sigs.k8s.io/yaml v1.6.0
 )
 
 require (
-	cloud.google.com/go/profiler v0.6.0
-	cloud.google.com/go/pubsub v1.51.0
-	cloud.google.com/go/pubsub/v2 v2.6.1
+	cloud.google.com/go/profiler v0.7.1
+	cloud.google.com/go/pubsub/v2 v2.9.0
+	cloud.google.com/go/pubsub/v2 v2.9.0
 	github.com/AdamKorcz/go-fuzz-headers-1 v0.0.0-20230919221257-8b5d3ce2d11d
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/cyberphone/json-canonicalization v0.0.0-20241213102144-19d51d7fe467
+	github.com/cyberphone/json-canonicalization v0.0.0-20261011152517-32a48195b9b2
 	github.com/go-chi/chi/v5 v5.3.1
-	github.com/go-openapi/swag/cmdutils v0.26.1
-	github.com/go-openapi/swag/conv v0.28.0
-	github.com/go-openapi/swag/jsonutils v0.28.0
-	github.com/go-openapi/swag/netutils v0.26.1
-	github.com/go-openapi/swag/typeutils v0.28.0
+	github.com/go-openapi/swag/cmdutils v0.29.2
+	github.com/go-openapi/swag/conv v0.29.2
+	github.com/go-openapi/swag/jsonutils v0.29.2
+	github.com/go-openapi/swag/netutils v0.29.2
+	github.com/go-openapi/swag/typeutils v0.29.2
 	github.com/go-redis/redismock/v9 v9.2.0
-	github.com/go-sql-driver/mysql v1.10.0
+	github.com/go-sql-driver/mysql v1.10.1
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/golang/mock v1.7.0-rc.1
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/redis/go-redis/v9 v9.22.0
-	github.com/sigstore/protobuf-specs v0.5.1
-	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.9
-	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.9
-	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.10.9
-	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.10.9
-	github.com/stretchr/testify v1.11.1
+	github.com/redis/go-redis/v9 v9.23.0
+	github.com/sigstore/protobuf-specs v0.5.2
+	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.11.3
+	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.11.3
+	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.11.3
+	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.11.3
+	github.com/stretchr/testify v1.12.1
 	github.com/tink-crypto/tink-go-gcpkms/v2 v2.4.0
-	github.com/tink-crypto/tink-go/v2 v2.7.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260720155508-bb71a54f79dc
+	github.com/tink-crypto/tink-go/v2 v2.9.0
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261110000943-09e21b237f2c
 )
 
 require (
@@ -171,11 +171,11 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0 // indirect
-	cloud.google.com/go/iam v1.13.0
+	cloud.google.com/go/iam v1.15.1
 	cloud.google.com/go/kms v1.33.0 // indirect
 	cloud.google.com/go/storage v1.62.0 // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
-	github.com/ProtonMail/go-crypto v1.4.1
+	github.com/ProtonMail/go-crypto v1.5.2
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.2.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -196,7 +196,7 @@ require (
 	github.com/google/wire v0.7.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.18 // indirect
 	github.com/googleapis/gax-go/v2 v2.23.0 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.4
 	github.com/hashicorp/hcl v1.0.1-vault-7 // indirect
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef // indirect
 	github.com/in-toto/attestation v1.1.2 // indirect
@@ -218,13 +218,13 @@ require (
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.step.sm/crypto v0.87.0
+	go.step.sm/crypto v0.92.0
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.45.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	google.golang.org/api v0.290.0
+	google.golang.org/api v0.312.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
